@@ -21,15 +21,103 @@
     </header>
 
     <main>
-        <div id="menu-container" class="menu-grid">
-            </div>
+        <div id="menu-container" class="menu-grid"></div>
     </main>
 
     <footer>
         <p>&copy; 2024 Questfield Menu. Poftă bună!</p>
     </footer>
 
-    <script src="./script.js"></script>
+    <script>
+        // 1. Datele meniului
+        const menuData = [
+            {
+                day: "Luni",
+                soup: "Supă cremă de legume cu crutoane",
+                main: "Piept de pui la grătar cu piure de cartofi",
+                dessert: "Fructe proaspete de sezon"
+            },
+            {
+                day: "Marți",
+                soup: "Ciorbă de văcuță țărănească",
+                main: "Paste Bolognese cu parmezan",
+                dessert: "Iaurt cu miere și nuci"
+            },
+            {
+                day: "Miercuri",
+                soup: "Supă de pui cu tăieței de casă",
+                main: "Pilaf de orez cu ciuperci și salată verde",
+                dessert: "Prăjitură de casă cu mere"
+            },
+            {
+                day: "Joi",
+                soup: "Supă cremă de roșii cu busuioc",
+                main: "Curcan la cuptor cu legume gratinate",
+                dessert: "Salam de biscuiți"
+            },
+            {
+                day: "Vineri",
+                soup: "Ciorbă de perișoare",
+                main: "Pește la cuptor cu mămăliguță și mujdei",
+                dessert: "Plăcintă cu brânză dulce"
+            }
+        ];
+
+        // 2. Funcția de generare
+        function generateMenu() {
+            const container = document.getElementById('menu-container');
+            
+            // Verificăm dacă elementul există
+            if (!container) {
+                console.error("Eroare: Nu am găsit elementul 'menu-container'");
+                return;
+            }
+
+            container.innerHTML = ''; // Curățăm containerul
+
+            menuData.forEach(item => {
+                const card = document.createElement('article');
+                card.className = 'day-card';
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h2>${item.day}</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="meal-item">
+                            <span class="meal-icon">🥣</span>
+                            <div class="meal-details">
+                                <h3>Supă / Ciorbă</h3>
+                                <p>${item.soup}</p>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-icon">🍽️</span>
+                            <div class="meal-details">
+                                <h3>Fel Principal</h3>
+                                <p>${item.main}</p>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-icon">🍪</span>
+                            <div class="meal-details">
+                                <h3>Gustare / Desert</h3>
+                                <p>${item.dessert}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            console.log("Meniul a fost generat cu succes!");
+        }
+
+        // 3. Rulăm funcția imediat
+        generateMenu();
+    </script>
 </body>
 </html>
+</body>
+</html>
+
 
