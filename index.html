@@ -7,10 +7,234 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="style.css">
-
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* --- STILURI CSS (DESIGN QUESTFIELD) --- */
+        :root {
+            --q-blue: #00204a;      /* Albastrul închis Questfield */
+            --q-gold: #eebf3f;      /* Auriul specific */
+            --q-green: #e2efda;     /* Verde deschis pentru rândul Salată */
+            --q-text: #333333;
+            --q-bg: #f9f9f9;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--q-bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--q-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border-radius: 4px;
+        }
+
+        /* HEADER */
+        header h1 {
+            color: var(--q-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 26px;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 1.5px;
+            position: relative;
+        }
+        
+        header h1::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: var(--q-gold);
+            margin: 15px auto 0;
+        }
+
+        /* NAVIGARE DATE (Tab-uri) */
+        .week-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-bottom: 3px solid transparent;
+            color: var(--q-text);
+            padding: 12px 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--q-gold);
+            color: var(--q-blue);
+        }
+
+        .tab-btn.active {
+            background-color: var(--q-blue);
+            color: white;
+            border-color: var(--q-blue);
+            border-bottom: 3px solid var(--q-gold);
+        }
+
+        /* BUTON LIMBĂ */
+        .lang-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .lang-btn {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 6px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            color: #666;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        .lang-btn:hover { border-color: var(--q-blue); color: var(--q-blue); }
+
+        /* TABEL */
+        .table-responsive {
+            overflow-x: auto;
+            border-top: 2px solid var(--q-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: var(--q-blue);
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        td {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        /* Prima coloană (Categorie) */
+        td:first-child {
+            background-color: var(--q-blue);
+            color: white;
+            font-weight: bold;
+            text-align: left;
+            width: 180px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        /* Rândul Salată (Verde) */
+        tr.row-salata td:not(:first-child) {
+            background-color: var(--q-green);
+        }
+
+        /* FOOTER & ADMIN */
+        footer {
+            margin-top: auto;
+            padding-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .admin-lock {
+            cursor: pointer;
+            margin-bottom: 5px;
+            opacity: 0.1; /* Foarte discret */
+            transition: opacity 0.3s;
+        }
+        .admin-lock:hover { opacity: 1; color: var(--q-blue); }
+
+        /* MODAL (Pop-up Admin) */
+        .modal {
+            display: none;
+            position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .close-btn {
+            position: absolute; right: 20px; top: 15px;
+            font-size: 24px; cursor: pointer; color: #999;
+        }
+        .custom-file-upload {
+            border: 2px dashed #ddd;
+            display: block;
+            padding: 30px;
+            cursor: pointer;
+            margin: 20px 0;
+            font-weight: bold;
+            color: var(--q-blue);
+            background: #fafafa;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .custom-file-upload:hover { background: #f0f4f8; border-color: var(--q-blue); }
+        input[type="file"] { display: none; }
+        
+        .save-btn {
+            background: #27ae60; color: white; border: none;
+            padding: 15px; margin-top: 15px; cursor: pointer;
+            font-size: 14px; font-weight: bold; border-radius: 4px;
+            width: 100%;
+            text-transform: uppercase;
+        }
+        .save-btn:hover { background: #219150; }
+
+        @media (max-width: 768px) {
+            .week-tabs { flex-direction: column; gap: 5px; }
+            .tab-btn { width: 100%; border-bottom: 1px solid #ddd; }
+            .tab-btn.active { border-bottom: 1px solid var(--q-gold); }
+            th, td { font-size: 12px; padding: 10px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -20,10 +244,10 @@
         </header>
 
         <div class="week-tabs">
-            <button onclick="setWeek('S1')" id="btnS1" class="tab-btn active"></button>
-            <button onclick="setWeek('S2')" id="btnS2" class="tab-btn"></button>
-            <button onclick="setWeek('S3')" id="btnS3" class="tab-btn"></button>
-            <button onclick="setWeek('S4')" id="btnS4" class="tab-btn"></button>
+            <button onclick="setWeek('S1')" id="btnS1" class="tab-btn active">...</button>
+            <button onclick="setWeek('S2')" id="btnS2" class="tab-btn">...</button>
+            <button onclick="setWeek('S3')" id="btnS3" class="tab-btn">...</button>
+            <button onclick="setWeek('S4')" id="btnS4" class="tab-btn">...</button>
         </div>
 
         <div class="lang-container">
@@ -33,11 +257,9 @@
         <div class="table-responsive">
             <table>
                 <thead>
-                    <tr id="tableHeaders">
-                        </tr>
+                    <tr id="tableHeaders"></tr>
                 </thead>
-                <tbody id="tableBody">
-                    </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
     </div>
@@ -46,36 +268,818 @@
         <div class="admin-lock" onclick="openAdminPanel()">
             <i class="fas fa-lock"></i>
         </div>
-        <p>&copy; Questfield</p>
+        <p>&copy; Questfield Menu</p>
     </footer>
 
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeAdminPanel()">&times;</span>
             <h3>Actualizare Meniu</h3>
-            <p>Selectează fișierul Excel (format .xlsx)</p>
+            <p>Selectează fișierul Excel (.xlsx)</p>
             
             <div class="upload-box">
                 <input type="file" id="excelInput" accept=".xlsx, .xls" />
                 <label for="excelInput" class="custom-file-upload">
-                    <i class="fas fa-upload"></i> Încarcă Excel
+                    <i class="fas fa-upload"></i> <span id="fileNameDisplay">Alege Fișier</span>
                 </label>
-                <div id="fileName">Niciun fișier selectat</div>
             </div>
 
             <div id="statusMsg"></div>
 
             <div id="saveSection" style="display:none;">
                 <hr>
-                <p style="color: green; font-weight: bold;">Date citite corect!</p>
-                <p>Descarcă noul fișier <code>data.js</code> și încarcă-l pe GitHub:</p>
-                <button onclick="downloadNewData()" class="save-btn">Descarcă data.js</button>
+                <p style="color: green; font-weight: bold;">Date procesate cu succes!</p>
+                <p style="font-size:13px; color:#555;">S-a generat un nou fișier index.html cu datele actualizate.</p>
+                <button onclick="downloadNewIndex()" class="save-btn">Descarcă noul index.html</button>
             </div>
         </div>
     </div>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // --- 1. DATELE (EMBEDDED) ---
+        // Aici sunt datele tale extrase din fișiere.
+        // Când vei folosi funcția de update, acest bloc va fi înlocuit automat.
+        const menuData = {
+  "S1": {
+    "ro": {
+      "days": [
+        "Luni",
+        "Marți",
+        "Miercuri",
+        "Joi",
+        "Vineri"
+      ],
+      "rows": [
+        {
+          "type": "Felul 1",
+          "items": [
+            "Supă cremă de legume cu pătrunjel proaspăt și crutoane asezonate",
+            "Supă de curcan cu găluște",
+            "Ciorbă de văcuță",
+            "Supă cremă de linte și crutoane asezonate",
+            "Ciorbă țărănească de pui cu legume și ou"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Supă cremă de legume cu pătrunjel proaspăt și crutoane asezonate",
+            "Supă de legume cu găluște",
+            "Supă cremă de rădăcinoase",
+            "Supă cremă de linte și crutoane asezonate",
+            "Ciorbă țărănească de legume"
+          ]
+        },
+        {
+          "type": "Felul 2",
+          "items": [
+            "File de somon la cuptor cu risotto",
+            "Friptură de curcan feliată la cuptor cu legume (cartofi baby, ardei, dovlecei)",
+            "Varză călită cu carne și mămăligă",
+            "Quesadilla cu carne de vită",
+            "Chicken Fingers cu piure de cartofi"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "File de somon la cuptor cu risotto / Wrap cu pateu de linte și ardei copți",
+            "Mâncare de spanac cu ouă",
+            "Mămăligă cu brânză, smântână și ou poșat",
+            "Quesadilla vegetariană",
+            "Paste Napoletana (cu mozzarella)"
+          ]
+        },
+        {
+          "type": "Salată",
+          "items": [
+            "Salată de roșii și castraveți cu ceapă verde",
+            "Salată grecească",
+            "-",
+            "Rondele de legume",
+            "Salată de varză cu morcovi"
+          ]
+        },
+        {
+          "type": "Gustare",
+          "items": [
+            "Mini guguluf imperial",
+            "Sandviș cu unt, șuncă, cașcaval și ardei",
+            "Chec cu lămâie",
+            "Carrot Cake",
+            "Plăcintă cu brânză dulce"
+          ]
+        }
+      ]
+    },
+    "en": {
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "rows": [
+        {
+          "type": "Main Course",
+          "items": [
+            "Cream Vegetable Soup with Fresh Parsley and Seasoned Croutons",
+            "Turkey Broth with Fluffy Dumplings",
+            "Beef Soup",
+            "Creamy Lentil Soup with Vegetables and Croutons",
+            "Rustic Farmhouse Chicken Soup with Garden Vegetables and Egg Drop"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Cream Vegetable Soup with Fresh Parsley and Seasoned Croutons",
+            "Vegetable Soup with Fluffy Dumplings",
+            "Creamy Root Vegetable Soup",
+            "Creamy Lentil Soup with Vegetables and Croutons",
+            "Rustic Soup with Garden Vegetables and Egg Drop"
+          ]
+        },
+        {
+          "type": "Second Course",
+          "items": [
+            "Oven-Baked Salmon Fillet with Risotto",
+            "Oven-Roasted Turkey Slices with Baked Baby Potatoes, Peppers, and Courgettes",
+            "Sautéed cabbage with meat and polenta",
+            "Beef Quesadilla",
+            "Chicken Fingers with Mashed Potatoes"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Oven-baked salmon fillet with risotto / Lentil pâté and roasted pepper wrap",
+            "Spinach and Fried Eggs",
+            "Polenta with cheese, sour cream and a poached egg",
+            "Vegetarian Quesadilla",
+            "Napoletana pasta (with mozzarella)"
+          ]
+        },
+        {
+          "type": "Salad",
+          "items": [
+            "Tomato and Cucumber Salad with Spring Onion",
+            "Greek Salad",
+            "-",
+            "Vegetable Rings",
+            "Cabbage and Carrot Salad"
+          ]
+        },
+        {
+          "type": "Snack",
+          "items": [
+            "Mini Royal Bundt Cake",
+            "Buttered Ham and Cheese Sandwich with Peppers",
+            "Chec cu lămâie",
+            "Carrot Cake",
+            "Sweet Cheese Pie"
+          ]
+        }
+      ]
+    }
+  },
+  "S2": {
+    "ro": {
+      "days": [
+        "Luni",
+        "Marți",
+        "Miercuri",
+        "Joi",
+        "Vineri"
+      ],
+      "rows": [
+        {
+          "type": "Felul 1",
+          "items": [
+            "Supă cremă de rădăcinoase și pită asezonată",
+            "Supă de pui cu fidea alfabet",
+            "Borș de curcan",
+            "Supă cremă de morcovi și cartofi dulci, crutoane asezonate",
+            "Ciorbă de perișoare cu carne de vită"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Supă cremă de rădăcinoase și pită asezonată",
+            "Supă de legume cu fidea alfabet",
+            "Școală: Borș de legume",
+            "Supă cremă de morcovi și cartofi dulci, crutoane asezonate",
+            "Ciorbă de legume"
+          ]
+        },
+        {
+          "type": "Felul 2",
+          "items": [
+            "Piept de curcan la cuptor cu sos alb și risotto",
+            "Aripioare de pui marinate și cartofi cu usturoi și rozmarin",
+            "Școală: Ardei umpluți cu vită / Grădi: Chifteluțe de vită cu piure",
+            "Pulpe de pui la cuptor și mix de legume sote",
+            "Penne cu 4 tipuri de brânză și broccoli (sau cu sos roșu)"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Frigărui cu halloumi și legume + risotto",
+            "Cașcaval pane și cartofi cu usturoi și rozmarin",
+            "Ardei umpluți cu orez și legume, serviți cu iaurt grecesc",
+            "Tocăniță de legume cu linte",
+            "Penne cu 4 tipuri de brânză și broccoli (sau cu sos roșu)"
+          ]
+        },
+        {
+          "type": "Salată",
+          "items": [
+            "Salată mix de frunze cu roșii cherry și castraveți",
+            "Salată de varză",
+            "Rondele de legume",
+            "Salată de sfeclă roșie",
+            "Broccoli"
+          ]
+        },
+        {
+          "type": "Gustare",
+          "items": [
+            "Sandviș cu unt, șuncă, cașcaval și ardei",
+            "Ștrudel cu mere",
+            "Prăjitură cu vișine",
+            "Chec cu lămâie",
+            "Lipie cu humus și ardei"
+          ]
+        }
+      ]
+    },
+    "en": {
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "rows": [
+        {
+          "type": "Main Course",
+          "items": [
+            "Creamy Root Vegetable Soup with Seasoned Flatbread",
+            "Chicken Soup with Alphabet Noodles",
+            "Turkey Borsch",
+            "Creamy Carrot and Sweet Potato Soup with Seasoned Croutons",
+            "Beef Meatball Soup"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Creamy Root Vegetable Soup with Seasoned Flatbread",
+            "Vegetable Soup with Alphabet Noodles",
+            "Vegetable borscht",
+            "Creamy Carrot and Sweet Potato Soup with Seasoned Croutons",
+            "Vegetable soup"
+          ]
+        },
+        {
+          "type": "Second Course",
+          "items": [
+            "Oven-Roasted Turkey Breast with White Sauce and Risotto",
+            "Marinated Grilled Chicken Breast with Courgettes",
+            "School: Stuffed peppers with beef / Kindergarten: Beef meatballs with mashed potatoes",
+            "Oven-Roasted Chicken Thighs with Sautéed Vegetable Mix",
+            "Four-Cheese / Tomato Sauce Penne with Broccoli"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Halloumi and Vegetable Skewers with Risotto",
+            "Breaded Cheese with garlic-rosemary baked potatoes",
+            "Stuffed peppers with rice and vegetables, served with Greek yoghurt",
+            "Vegetable and Lentil Stew",
+            "Four-Cheese / Tomato Sauce Penne with Broccoli"
+          ]
+        },
+        {
+          "type": "Salad",
+          "items": [
+            "Mixed Leaf Salad with Cherry Tomatoes and Cucumbers",
+            "Coleslaw",
+            "Vegetable slices",
+            "Beetroot salad",
+            "Broccoli"
+          ]
+        },
+        {
+          "type": "Snack",
+          "items": [
+            "Buttered Ham and Cheese Sandwich with Peppers",
+            "Apple Strudel",
+            "Sour Cherry Sponge Cake",
+            "Lemon Loaf Cake",
+            "Flatbread with hummus and peppers"
+          ]
+        }
+      ]
+    }
+  },
+  "S3": {
+    "ro": {
+      "days": [
+        "Luni",
+        "Marți",
+        "Miercuri",
+        "Joi",
+        "Vineri"
+      ],
+      "rows": [
+        {
+          "type": "Felul 1",
+          "items": [
+            "Supă cremă de roșii cu busuioc și crutoane",
+            "Supă de pui cu găluște",
+            "Supă cremă de morcovi cu năut și crutoane",
+            "Ciorbă țărănească de curcan cu legume și ou",
+            "Ciorbă de pui oltenească cu cartofi și dovlecei (fără mărar)"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Supă cremă de roșii cu busuioc și crutoane",
+            "Supă de legume cu găluște",
+            "Supă cremă de morcovi cu năut și crutoane",
+            "Borș țărănesc de legume cu zdrențe de ou",
+            "Supă cremă de legume"
+          ]
+        },
+        {
+          "type": "Felul 2",
+          "items": [
+            "Specialitate grecească",
+            "Piept de pui soté cu parmezan, cartofi wedges și morcovi gratinați",
+            "Friptură de vită înăbușită cu sos separat și risotto",
+            "Școală: Mâncare de mazăre cu curcan / Grădi: Mâncare de cartofi cu curcan",
+            "Pui crispy cu piure de legume"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Specialitate grecească vegetariană",
+            "Couscous cu legume gratinate",
+            "Gratin de brocoli, morcovi, smântână și parmezan",
+            "Mâncare de mazăre",
+            "Cașcaval la cuptor cu piure de legume"
+          ]
+        },
+        {
+          "type": "Salată",
+          "items": [
+            "Mix de frunze cu roșii cherry și castraveți",
+            "Salată grecească",
+            "Salată de varză cu morcovi",
+            "Salată de sfeclă roșie",
+            "Salată asortată cu frunze verzi"
+          ]
+        },
+        {
+          "type": "Gustare",
+          "items": [
+            "Mini-guguluf imperial",
+            "Placintă cu brânză sărată",
+            "Prajitură cu mascarpone și căpșuni",
+            "Carrot cake",
+            "Iaurt cu banană"
+          ]
+        }
+      ]
+    },
+    "en": {
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "rows": [
+        {
+          "type": "Main Course",
+          "items": [
+            "Creamy Tomato Soup with Fresh Basil and Seasoned Croutons",
+            "Chicken Soup with Fluffy Dumplings",
+            "Cream of carrot soup with chickpeas and seasoned croutons",
+            "Rustic Country-Style Turkey Soup with Vegetables and Egg Drop",
+            "Oltenian-Style Chicken Soup with Potatoes and Courgettes"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Creamy Tomato Soup with Fresh Basil and Seasoned Croutons",
+            "Vegetable Soup with Fluffy Dumplings",
+            "Cream of carrot soup with chickpeas and seasoned croutons",
+            "Traditional Country-Style Vegetable Borsch with Egg Drop",
+            "Cream of vegetable soup"
+          ]
+        },
+        {
+          "type": "Second Course",
+          "items": [
+            "Greek Special",
+            "Sautéed Chicken Breast with Garlic and Parmesan",
+            "Braised Beef with Sauce on the Side and Risotto",
+            "School: Stewed peas with turkey / Kindergarten: Stewed potatoes with turkey",
+            "Crispy Chicken with Vegetable Purée"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Vegetarian Greek Special",
+            "Couscous with Grilled Vegetables",
+            "Broccoli and carrot gratin with cream and Parmesan",
+            "Polenta with Cheese, Sour Cream, and Fried Egg",
+            "Oven-Baked Cheese with Vegetable Purée"
+          ]
+        },
+        {
+          "type": "Salad",
+          "items": [
+            "Mixed Leaf Salad with Cherry Tomatoes and Cucumber",
+            "Greek Salad",
+            "Cabbage and carrot salad",
+            "Beetroot salad",
+            "Mixed Salad"
+          ]
+        },
+        {
+          "type": "Snack",
+          "items": [
+            "Imperial Mini Bundt Cake",
+            "Savoury cheese pie",
+            "Mascarpone and Strawberry Cake",
+            "Carrot Cake",
+            "Banana Yoghurt"
+          ]
+        }
+      ]
+    }
+  },
+  "S4": {
+    "ro": {
+      "days": [
+        "Luni",
+        "Marți",
+        "Miercuri",
+        "Joi",
+        "Vineri"
+      ],
+      "rows": [
+        {
+          "type": "Felul 1",
+          "items": [
+            "Supă cremă de rădăcinoase și pită asezonată",
+            "Supă de pui cu fidea alfabet",
+            "Borș țărănesc de legume cu ou, smântână și leuștean",
+            "Supă de vită cu legume julienne",
+            "Ciorbă cu perișoare din carne de curcan"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Supă cremă de rădăcinoase și pită asezonată",
+            "Ciorbă oltenească de legume",
+            "Borș țărănesc de legume cu ou, smântână și leuștean",
+            "Ciorbă de legume cu zdrențe de ou",
+            "Supă cremă de linte"
+          ]
+        },
+        {
+          "type": "Felul 2",
+          "items": [
+            "Biban cu cartofi natur și sos de lămaie",
+            "Piept de pui marinat și salată de paste cu legume stil mediteranean",
+            "Ostropel de curcan cu mămăligă",
+            "Specialitate italiană",
+            "Cașcaval pane la cuptor cu legume la cuptor"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Biban cu cartofi natur / Paste cu sos de roșii și parmezan",
+            "Halloumi la grătar și salată de paste cu legume stil mediteranean",
+            "Tocăniță de legume cu năut",
+            "Specialitate italiană",
+            "Cașcaval pane la cuptor cu legume la cuptor"
+          ]
+        },
+        {
+          "type": "Salată",
+          "items": [
+            "Salată verde",
+            "-",
+            "Salată de varză albă și roșie",
+            "Mix de legume colorate",
+            "Salată de crudități"
+          ]
+        },
+        {
+          "type": "Gustare",
+          "items": [
+            "Focaccia cu cremă de brânză și legume",
+            "Banana Bread",
+            "Clătite cu miere",
+            "Orez cu lapte",
+            "Prăjitură cu vișine"
+          ]
+        }
+      ]
+    },
+    "en": {
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "rows": [
+        {
+          "type": "Main Course",
+          "items": [
+            "Creamy Root Vegetable Soup with Seasoned Flatbread",
+            "Chicken Soup with Alphabet Noodles",
+            "Rustic vegetable borscht with egg, sour cream, and lovage",
+            "Beef soup with julienned vegetables",
+            "Turkey Meatball Soup"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Creamy Root Vegetable Soup with Seasoned Flatbread",
+            "Oltenian vegetable soup",
+            "Rustic vegetable borscht with egg, sour cream and lovage",
+            "Vegetable soup with egg ribbons",
+            "Cream of lentil soup"
+          ]
+        },
+        {
+          "type": "Second Course",
+          "items": [
+            "Seabass with boiled potatoes and lemon sauce",
+            "Marinated chicken breast with pasta salad and vegetables",
+            "Turkey stew in garlic-tomato sauce, served with polenta",
+            "Italian Special",
+            "Oven-Baked Breaded Cheese with Roasted Vegetables"
+          ]
+        },
+        {
+          "type": "Vegetarian",
+          "items": [
+            "Seabass / Pasta with tomato sauce and Parmesan",
+            "Grilled halloumi with pasta salad and vegetables",
+            "Vegetable stew with chickpeas",
+            "Italian Special",
+            "Oven-Baked Breaded Cheese with Roasted Vegetables"
+          ]
+        },
+        {
+          "type": "Salad",
+          "items": [
+            "Green Salad",
+            "-",
+            "White and red cabbage salad",
+            "Rainbow Salad",
+            "Raw vegetable salad"
+          ]
+        },
+        {
+          "type": "Snack",
+          "items": [
+            "Focaccia with cream cheese and vegetables",
+            "Banana Bread",
+            "Fluffy Pancakes with Honey",
+            "Rice pudding",
+            "Sour Cherry Cake"
+          ]
+        }
+      ]
+    }
+  }
+};
+
+        // --- 2. CONFIGURARE & STATE ---
+        let currentWeek = 'S1';
+        let currentLang = 'ro';
+        let generatedData = null; // Pentru admin
+
+        // --- 3. FUNCȚII UTILITARE (Date) ---
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function formatDate(date) {
+            let day = date.getDate().toString().padStart(2, '0');
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${day}.${month}`;
+        }
+
+        function generateDateLabels() {
+            let today = new Date();
+            let startOfCurrentWeek = getMonday(today);
+
+            for (let i = 0; i < 4; i++) {
+                let monday = new Date(startOfCurrentWeek);
+                monday.setDate(startOfCurrentWeek.getDate() + (i * 7));
+                
+                let friday = new Date(monday);
+                friday.setDate(monday.getDate() + 4);
+
+                let label = `${formatDate(monday)} - ${formatDate(friday)}`;
+                
+                const btn = document.getElementById(`btnS${i+1}`);
+                if(btn) btn.textContent = label;
+            }
+        }
+
+        // --- 4. RENDER MENIU ---
+        function renderMenu() {
+            const data = menuData[currentWeek][currentLang];
+            if(!data) return;
+
+            const headers = document.getElementById('tableHeaders');
+            const body = document.getElementById('tableBody');
+
+            // Header
+            headers.innerHTML = `<th>${currentLang === 'ro' ? 'Categorie' : 'Course'}</th>`;
+            data.days.forEach(day => {
+                const th = document.createElement('th');
+                th.textContent = day;
+                headers.appendChild(th);
+            });
+
+            // Body
+            body.innerHTML = '';
+            data.rows.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                if(row.type.toLowerCase().includes('salat') || row.type.toLowerCase().includes('salad')) {
+                    tr.classList.add('row-salata');
+                }
+
+                const tdType = document.createElement('td');
+                tdType.innerHTML = `<strong>${row.type}</strong>`;
+                tr.appendChild(tdType);
+
+                row.items.forEach(item => {
+                    const td = document.createElement('td');
+                    td.textContent = item || '-';
+                    tr.appendChild(td);
+                });
+
+                body.appendChild(tr);
+            });
+
+            // Active Tab
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn${currentWeek}`).classList.add('active');
+        }
+
+        function setWeek(week) {
+            currentWeek = week;
+            renderMenu();
+        }
+
+        function toggleLang() {
+            currentLang = currentLang === 'ro' ? 'en' : 'ro';
+            renderMenu();
+        }
+
+        // --- 5. ADMIN LOGIC ---
+        function openAdminPanel() {
+            const pwd = prompt("Parola Admin:");
+            if(pwd === "questfield") {
+                document.getElementById('adminModal').style.display = 'block';
+            } else if (pwd !== null) alert("Parola greșită!");
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        document.getElementById('excelInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('fileNameDisplay').textContent = file.name;
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const newData = processExcel(workbook);
+                    
+                    if(newData) {
+                        generatedData = newData;
+                        document.getElementById('statusMsg').innerHTML = "<span style='color:green'>Fișier valid!</span>";
+                        document.getElementById('saveSection').style.display = 'block';
+                        // Preview
+                        Object.assign(menuData, newData);
+                        renderMenu();
+                    }
+                } catch(err) {
+                    console.error(err);
+                    alert("Eroare la citire.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function processExcel(workbook) {
+            const newData = {};
+            workbook.SheetNames.forEach(sheet => {
+                if(!sheet.startsWith("S")) return;
+                const ws = workbook.Sheets[sheet];
+                const json = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+
+                let roIdx = -1, enIdx = -1;
+                json.forEach((row, i) => {
+                    const str = JSON.stringify(row).toLowerCase();
+                    if(str.includes("luni")) roIdx = i;
+                    if(str.includes("monday")) enIdx = i;
+                });
+
+                if(roIdx > -1 && enIdx > -1) {
+                    newData[sheet] = {
+                        ro: extractBlock(json, roIdx),
+                        en: extractBlock(json, enIdx)
+                    };
+                }
+            });
+            return Object.keys(newData).length > 0 ? newData : null;
+        }
+
+        function extractBlock(json, startIdx) {
+            const header = json[startIdx];
+            const days = header.slice(1, 6).filter(d => d);
+            const rows = [];
+            let i = startIdx + 1;
+            while(i < json.length && rows.length < 6) {
+                const row = json[i];
+                if(row && row[0]) {
+                    rows.push({ type: row[0], items: row.slice(1, 6) });
+                }
+                i++;
+            }
+            return { days, rows };
+        }
+
+        function downloadNewIndex() {
+            if(!generatedData) return;
+            
+            // Această funcție regenerează întregul fișier HTML cu noile date injectate
+            const currentHTML = document.documentElement.outerHTML;
+            
+            // Căutăm blocul de date vechi și îl înlocuim
+            // Trucul este să găsim string-ul "const menuData = {" și să înlocuim tot obiectul
+            
+            // Regex pentru a găsi variabila menuData
+            const regex = /const menuData\s*=\s*\{[\s\S]*?\};/;
+            const newDataString = `const menuData = ${JSON.stringify(generatedData, null, 2)};`;
+            
+            const newHTML = currentHTML.replace(regex, newDataString);
+            
+            const blob = new Blob([newHTML], {type: "text/html"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "index.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            alert("Fișierul index.html nou a fost descărcat. Urcă-l pe GitHub!");
+        }
+
+        // Init
+        window.onload = function() {
+            generateDateLabels();
+            renderMenu();
+        };
+
+    </script>
 </body>
-</html>
 </html>
