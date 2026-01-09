@@ -5,89 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Questfield - Meniu Săptămânal</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
-        <div class="container">
-            <h1>Questfield International College</h1>
-            <p>Meniu Săptămânal</p>
+        <div class="container header-content">
+            <div class="logo-area">
+                 </div>
+
+            <div class="header-text">
+                <h1>Questfield International College</h1>
+                <p class="subtitle" data-i18n="subtitle">Meniu Săptămânal</p>
+            </div>
+
+            <div class="lang-switcher">
+                <button id="btn-ro" class="lang-btn active" onclick="changeLanguage('ro')">RO</button>
+                <span class="divider">|</span>
+                <button id="btn-en" class="lang-btn" onclick="changeLanguage('en')">EN</button>
+            </div>
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="navigation">
         <div class="container nav-container">
-            <button id="prevWeek" class="nav-button">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="prevWeek" class="nav-button" aria-label="Previous Week">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-                <span>Previous Week</span>
+                <span class="nav-text" data-i18n="prevWeek">Săpt. Anterioară</span>
             </button>
 
             <div class="week-info">
                 <div id="weekDates" class="week-dates"></div>
-                <div id="currentWeekBadge" class="current-week-badge" style="display: none;">Current Week</div>
-                <button id="goToCurrentWeek" class="go-to-current" style="display: none;">Go to Current Week</button>
+                <div id="currentWeekBadge" class="current-week-badge" style="display: none;" data-i18n="currentWeekBadge">Săptămâna Curentă</div>
+                <button id="goToCurrentWeek" class="go-to-current" style="display: none;" data-i18n="backToCurrent">Înapoi la Săptămâna Curentă</button>
             </div>
 
-            <button id="nextWeek" class="nav-button">
-                <span>Next Week</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button id="nextWeek" class="nav-button" aria-label="Next Week">
+                <span class="nav-text" data-i18n="nextWeek">Săpt. Următoare</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             </button>
         </div>
     </nav>
 
-    <!-- Menu Content -->
     <main class="main-content">
         <div class="container">
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Se încarcă meniul...</p>
+                <p data-i18n="loading">Se încarcă meniul...</p>
             </div>
 
             <div id="error" class="error" style="display: none;">
-                <p>Nu s-au putut încărca datele meniului. Vă rugăm să încercați mai târziu.</p>
+                <p data-i18n="error">Nu s-au putut încărca datele meniului.</p>
             </div>
 
-            <div id="menuTable" class="menu-table-container" style="display: none;">
-                <table class="menu-table">
-                    <thead>
-                        <tr>
-                            <th class="category-header">Categorie</th>
-                            <th>Luni</th>
-                            <th>Marți</th>
-                            <th>Miercuri</th>
-                            <th>Joi</th>
-                            <th>Vineri</th>
-                        </tr>
-                    </thead>
-                    <tbody id="menuTableBody">
-                        <!-- Content will be populated by JavaScript -->
-                    </tbody>
-                </table>
+            <div id="menuTable" class="menu-wrapper" style="display: none;">
+                <div class="table-responsive">
+                    <table class="menu-table">
+                        <thead>
+                            <tr>
+                                <th class="category-header" data-i18n="category">Categorie</th>
+                                <th data-i18n="mon">Luni</th>
+                                <th data-i18n="tue">Marți</th>
+                                <th data-i18n="wed">Miercuri</th>
+                                <th data-i18n="thu">Joi</th>
+                                <th data-i18n="fri">Vineri</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTableBody">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="menu-legend">
+                    <small data-i18n="disclaimer">* Ingredientele pot varia.</small>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>Meniul poate suferi modificări în funcție de disponibilitatea ingredientelor.</p>
-                <p class="footer-contact">Pentru întrebări, contactați bucătăria la: office@questfield.ro</p>
+                <p data-i18n="footerNote">Meniul poate suferi modificări.</p>
+                <p class="footer-contact">
+                    <span data-i18n="contact">Contact:</span> 
+                    <a href="mailto:office@questfield.ro">office@questfield.ro</a>
+                </p>
             </div>
             <div class="footer-copyright">
-                <p>© 2026 Questfield International College. Toate drepturile rezervate.</p>
+                <p>© 2026 Questfield International College.</p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script> 
 </body>
 </html>
-
 
 
