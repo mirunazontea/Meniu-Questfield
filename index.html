@@ -3,103 +3,672 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Questfield - Meniu Săptămânal</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Meniu Questfield</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* --- 2. STILURI CSS (DESIGN QUESTFIELD) --- */
+        :root {
+            --q-blue: #0E2636;      /* Albastru închis Questfield */
+            --q-gold: #CE9F49;      /* Auriu elegant */
+            --q-green: #E2EFDA;     /* Verde deschis (rând salată) */
+            --q-white: #FFFFFF;
+            --q-bg: #F9F9F9;
+            --q-text: #333333;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--q-bg);
+            margin: 0;
+            padding: 0;
+            color: var(--q-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--q-white);
+            margin: 40px 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: var(--q-blue);
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        header h1::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--q-gold);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        /* NAVIGARE SĂPTĂMÂNI (DATE) */
+        .week-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .week-btn {
+            background-color: var(--q-white);
+            border: 1px solid #E0E0E0;
+            color: var(--q-blue);
+            padding: 15px 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            text-align: center;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-btn:hover {
+            border-color: var(--q-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .week-btn.active {
+            background-color: var(--q-blue);
+            color: var(--q-white);
+            border-color: var(--q-blue);
+            box-shadow: 0 4px 10px rgba(14, 38, 54, 0.3);
+        }
+
+        /* BUTON LIMBĂ */
+        .lang-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 1px solid #CCC;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .lang-btn:hover {
+            border-color: var(--q-blue);
+            color: var(--q-blue);
+        }
+
+        /* TABEL */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 8px 8px 0 0;
+            border-top: 3px solid var(--q-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background-color: #F4F4F4;
+            color: var(--q-blue);
+            padding: 18px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1px solid #E0E0E0;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border: 1px solid #E0E0E0;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        /* Prima coloană (Categorii) */
+        td:first-child {
+            background-color: var(--q-blue);
+            color: var(--q-white);
+            font-weight: 700;
+            text-align: left;
+            width: 180px;
+            text-transform: capitalize;
+            border-color: #0b1f2d;
+        }
+
+        /* Rândul SALATĂ */
+        tr.row-salad td:not(:first-child) {
+            background-color: var(--q-green);
+        }
+
+        /* FOOTER & ADMIN */
+        footer {
+            margin-top: auto;
+            padding: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+            width: 100%;
+        }
+
+        .admin-trigger {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.3;
+            transition: 0.3s;
+            padding: 5px 10px;
+        }
+        .admin-trigger:hover {
+            opacity: 1;
+            color: var(--q-blue);
+            background: #eee;
+            border-radius: 20px;
+        }
+
+        /* MODAL ADMIN */
+        .modal {
+            display: none;
+            position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(14, 38, 54, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 8% auto;
+            padding: 40px;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute; right: 20px; top: 15px;
+            font-size: 28px; cursor: pointer; color: #aaa;
+        }
+        .close-modal:hover { color: var(--q-blue); }
+
+        .upload-zone {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #fafafa;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .upload-zone:hover { border-color: var(--q-blue); background: #f0f4f8; }
+
+        .btn-upload {
+            background: var(--q-blue); color: white;
+            padding: 10px 20px; border-radius: 4px; font-weight: 600;
+            display: inline-block; margin-bottom: 10px;
+        }
+
+        .btn-save {
+            background-color: #27ae60;
+            color: white; border: none;
+            padding: 15px 30px; font-size: 1rem; font-weight: bold;
+            border-radius: 5px; cursor: pointer; width: 100%;
+            margin-top: 20px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-save:hover { background-color: #219150; }
+
+        @media (max-width: 768px) {
+            .container { padding: 20px; margin: 10px; width: 95%; }
+            .week-nav { flex-direction: column; }
+            .week-btn { width: 100%; }
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container header-content">
-            <div class="logo-area">
-                 </div>
 
-            <div class="header-text">
-                <h1>Questfield International College</h1>
-                <p class="subtitle" data-i18n="subtitle">Meniu Săptămânal</p>
-            </div>
+    <div class="container">
+        <header>
+            <h1>Meniul Săptămânal</h1>
+        </header>
 
-            <div class="lang-switcher">
-                <button id="btn-ro" class="lang-btn active" onclick="changeLanguage('ro')">RO</button>
-                <span class="divider">|</span>
-                <button id="btn-en" class="lang-btn" onclick="changeLanguage('en')">EN</button>
-            </div>
+        <div class="week-nav">
+            <button onclick="setWeek(0)" id="btnW0" class="week-btn active">Loading...</button>
+            <button onclick="setWeek(1)" id="btnW1" class="week-btn">Loading...</button>
+            <button onclick="setWeek(2)" id="btnW2" class="week-btn">Loading...</button>
+            <button onclick="setWeek(3)" id="btnW3" class="week-btn">Loading...</button>
         </div>
-    </header>
 
-    <nav class="navigation">
-        <div class="container nav-container">
-            <button id="prevWeek" class="nav-button" aria-label="Previous Week">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                <span class="nav-text" data-i18n="prevWeek">Săpt. Anterioară</span>
-            </button>
-
-            <div class="week-info">
-                <div id="weekDates" class="week-dates"></div>
-                <div id="currentWeekBadge" class="current-week-badge" style="display: none;" data-i18n="currentWeekBadge">Săptămâna Curentă</div>
-                <button id="goToCurrentWeek" class="go-to-current" style="display: none;" data-i18n="backToCurrent">Înapoi la Săptămâna Curentă</button>
-            </div>
-
-            <button id="nextWeek" class="nav-button" aria-label="Next Week">
-                <span class="nav-text" data-i18n="nextWeek">Săpt. Următoare</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </button>
+        <div class="lang-wrapper">
+            <button onclick="toggleLang()" id="btnLang" class="lang-btn">RO / EN</button>
         </div>
-    </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p data-i18n="loading">Se încarcă meniul...</p>
-            </div>
-
-            <div id="error" class="error" style="display: none;">
-                <p data-i18n="error">Nu s-au putut încărca datele meniului.</p>
-            </div>
-
-            <div id="menuTable" class="menu-wrapper" style="display: none;">
-                <div class="table-responsive">
-                    <table class="menu-table">
-                        <thead>
-                            <tr>
-                                <th class="category-header" data-i18n="category">Categorie</th>
-                                <th data-i18n="mon">Luni</th>
-                                <th data-i18n="tue">Marți</th>
-                                <th data-i18n="wed">Miercuri</th>
-                                <th data-i18n="thu">Joi</th>
-                                <th data-i18n="fri">Vineri</th>
-                            </tr>
-                        </thead>
-                        <tbody id="menuTableBody">
-                            </tbody>
-                    </table>
-                </div>
-                <div class="menu-legend">
-                    <small data-i18n="disclaimer">* Ingredientele pot varia.</small>
-                </div>
-            </div>
+        <div class="table-wrap">
+            <table id="menuTable">
+                <thead>
+                    <tr id="tableHeader"></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
-    </main>
+    </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p data-i18n="footerNote">Meniul poate suferi modificări.</p>
-                <p class="footer-contact">
-                    <span data-i18n="contact">Contact:</span> 
-                    <a href="mailto:office@questfield.ro">office@questfield.ro</a>
-                </p>
-            </div>
-            <div class="footer-copyright">
-                <p>© 2026 Questfield International College.</p>
-            </div>
+    <footer>
+        <div class="admin-trigger" onclick="openAdmin()">
+            <i class="fas fa-lock"></i> <span>Administrare Meniu</span>
         </div>
+        <br><br>
+        &copy; 2024 Questfield
     </footer>
 
-    <script src="script.js"></script> 
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAdmin()">&times;</span>
+            <h2 style="color:var(--q-blue)">Actualizare Meniu</h2>
+            <p>Încarcă fișierul Excel (.xlsx) pentru a actualiza meniul.</p>
+            
+            <label for="excelFile" class="upload-zone">
+                <i class="fas fa-cloud-upload-alt" style="font-size:30px; color:var(--q-blue); margin-bottom:10px;"></i><br>
+                <span class="btn-upload">Alege Excel</span>
+                <div id="fileName" style="margin-top:10px; color:#666;">Niciun fișier selectat</div>
+                <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:none">
+            </label>
+
+            <div id="statusMessage"></div>
+
+            <div id="saveAction" style="display:none; text-align: left; background: #e8f5e9; padding: 15px; border-radius: 5px;">
+                <p style="color:green; font-weight:bold; margin:0 0 10px 0;">✔ Date procesate cu succes!</p>
+                <p style="font-size:0.85rem; margin:0;">Deoarece site-ul este static, trebuie să salvăm modificările manual:</p>
+                <button onclick="downloadUpdatedPage()" class="btn-save">
+                    <i class="fas fa-download"></i> Descarcă Noul Site
+                </button>
+                <p style="font-size:0.75rem; color:#666; margin-top:5px; text-align:center;">După descărcare, încarcă fișierul <b>index.html</b> pe GitHub.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 3. BAZA DE DATE (INTEGRATĂ) ---
+        // Acest obiect va fi înlocuit automat când faci update din Admin
+        const menuData = {
+  "S1": {
+    "ro": {
+      "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri"],
+      "rows": [
+        { "type": "Felul 1", "items": ["Supă cremă de legume cu pătrunjel proaspăt", "Supă de curcan cu găluște", "Ciorbă de văcuță", "Supă cremă de linte și crutoane", "Ciorbă țărănească de pui"] },
+        { "type": "Vegetarian", "items": ["Supă cremă de legume cu pătrunjel", "Supă de legume cu găluște", "Supă cremă de rădăcinoase", "Supă cremă de linte", "Ciorbă țărănească de legume"] },
+        { "type": "Felul 2", "items": ["File de somon la cuptor cu risotto", "Friptură de curcan la cuptor cu legume", "Varză călită cu carne și mămăligă", "Quesadilla cu carne de vită", "Chicken Fingers cu piure"] },
+        { "type": "Vegetarian", "items": ["Somon la cuptor / Wrap cu pateu de linte", "Mâncare de spanac cu ouă", "Mămăligă cu brânză și smântână", "Quesadilla vegetariană", "Paste Napoletana"] },
+        { "type": "Salată", "items": ["Salată de roșii și castraveți", "Salată grecească", "-", "Rondele de legume", "Salată de varză cu morcovi"] },
+        { "type": "Gustare", "items": ["Mini guguluf imperial", "Sandviș cu unt și șuncă", "Chec cu lămâie", "Carrot Cake", "Plăcintă cu brânză dulce"] }
+      ]
+    },
+    "en": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "rows": [
+        { "type": "Main Course", "items": ["Cream Vegetable Soup", "Turkey Broth with Dumplings", "Beef Soup", "Creamy Lentil Soup", "Rustic Chicken Soup"] },
+        { "type": "Vegetarian", "items": ["Cream Vegetable Soup", "Vegetable Soup", "Creamy Root Soup", "Creamy Lentil Soup", "Rustic Vegetable Soup"] },
+        { "type": "Second Course", "items": ["Baked Salmon with Risotto", "Roasted Turkey with Veggies", "Cabbage with meat and polenta", "Beef Quesadilla", "Chicken Fingers with Mash"] },
+        { "type": "Vegetarian", "items": ["Baked Salmon / Lentil Wrap", "Spinach and Eggs", "Polenta with Cheese", "Veggie Quesadilla", "Pasta Napoletana"] },
+        { "type": "Salad", "items": ["Tomato Cucumber Salad", "Greek Salad", "-", "Veggie Slices", "Cabbage Salad"] },
+        { "type": "Snack", "items": ["Mini Bundt Cake", "Ham Sandwich", "Lemon Cake", "Carrot Cake", "Sweet Cheese Pie"] }
+      ]
+    }
+  },
+  "S2": {
+    "ro": {
+      "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri"],
+      "rows": [
+        { "type": "Felul 1", "items": ["Supă cremă de rădăcinoase", "Supă de pui cu fidea", "Borș de curcan", "Supă cremă de morcovi", "Ciorbă de perișoare"] },
+        { "type": "Vegetarian", "items": ["Supă cremă de rădăcinoase", "Supă de legume", "Borș de legume", "Supă cremă de morcovi", "Ciorbă de legume"] },
+        { "type": "Felul 2", "items": ["Piept de curcan cu sos alb", "Aripioare de pui marinate", "Ardei umpluți cu vită", "Pulpe de pui la cuptor", "Penne cu 4 brânzeturi"] },
+        { "type": "Vegetarian", "items": ["Frigărui cu halloumi", "Cașcaval pane", "Ardei umpluți cu orez", "Tocăniță de legume", "Penne cu 4 brânzeturi"] },
+        { "type": "Salată", "items": ["Mix salată", "Salată de varză", "Legume", "Sfeclă roșie", "Broccoli"] },
+        { "type": "Gustare", "items": ["Sandviș", "Ștrudel cu mere", "Prăjitură cu vișine", "Chec", "Lipie cu humus"] }
+      ]
+    },
+    "en": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "rows": [
+        { "type": "Main Course", "items": ["Root Veg Soup", "Chicken Noodle Soup", "Turkey Borsch", "Carrot Soup", "Meatball Soup"] },
+        { "type": "Vegetarian", "items": ["Root Veg Soup", "Veg Noodle Soup", "Veg Borsch", "Carrot Soup", "Veg Soup"] },
+        { "type": "Second Course", "items": ["Turkey Breast White Sauce", "Marinated Chicken Wings", "Stuffed Peppers Beef", "Roasted Chicken Legs", "4-Cheese Penne"] },
+        { "type": "Vegetarian", "items": ["Halloumi Skewers", "Fried Cheese", "Stuffed Peppers Rice", "Veggie Stew", "4-Cheese Penne"] },
+        { "type": "Salad", "items": ["Mix Salad", "Coleslaw", "Veggies", "Beetroot", "Broccoli"] },
+        { "type": "Snack", "items": ["Sandwich", "Apple Strudel", "Cherry Cake", "Cake", "Hummus Wrap"] }
+      ]
+    }
+  },
+  "S3": {
+    "ro": {
+      "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri"],
+      "rows": [
+        { "type": "Felul 1", "items": ["Supă roșii", "Supă pui găluște", "Supă morcovi", "Ciorbă curcan", "Ciorbă pui a la grec"] },
+        { "type": "Vegetarian", "items": ["Supă roșii", "Supă legume", "Supă morcovi", "Borș legume", "Supă cremă legume"] },
+        { "type": "Felul 2", "items": ["Specialitate grecească", "Piept pui parmezan", "Vită înăbușită", "Mâncare mazăre curcan", "Pui crispy"] },
+        { "type": "Vegetarian", "items": ["Specialitate grecească veg", "Couscous legume", "Gratin broccoli", "Mâncare mazăre", "Cașcaval la cuptor"] },
+        { "type": "Salată", "items": ["Mix salată", "Salată grecească", "Salată varză", "Sfeclă", "Salată verde"] },
+        { "type": "Gustare", "items": ["Guguluf", "Plăcintă sărată", "Prăjitură mascarpone", "Carrot cake", "Iaurt"] }
+      ]
+    },
+    "en": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "rows": [
+        { "type": "Main Course", "items": ["Tomato Soup", "Chicken Dumpling Soup", "Carrot Soup", "Turkey Soup", "Greek Chicken Soup"] },
+        { "type": "Vegetarian", "items": ["Tomato Soup", "Veg Dumpling Soup", "Carrot Soup", "Veg Borsch", "Veg Cream Soup"] },
+        { "type": "Second Course", "items": ["Greek Special", "Parmesan Chicken", "Braised Beef", "Peas with Turkey", "Crispy Chicken"] },
+        { "type": "Vegetarian", "items": ["Greek Special Veg", "Couscous Veg", "Broccoli Gratin", "Peas Stew", "Baked Cheese"] },
+        { "type": "Salad", "items": ["Mix Salad", "Greek Salad", "Cabbage Salad", "Beetroot", "Green Salad"] },
+        { "type": "Snack", "items": ["Bundt Cake", "Cheese Pie", "Mascarpone Cake", "Carrot Cake", "Yogurt"] }
+      ]
+    }
+  },
+  "S4": {
+    "ro": {
+      "days": ["Luni", "Marți", "Miercuri", "Joi", "Vineri"],
+      "rows": [
+        { "type": "Felul 1", "items": ["Supă rădăcinoase", "Supă pui alfabet", "Borș țărănesc", "Supă vită", "Ciorbă perișoare"] },
+        { "type": "Vegetarian", "items": ["Supă rădăcinoase", "Ciorbă oltenească", "Borș țărănesc", "Ciorbă legume", "Supă linte"] },
+        { "type": "Felul 2", "items": ["Biban cartofi", "Piept pui mediteranean", "Ostropel curcan", "Specialitate italiană", "Cașcaval pane"] },
+        { "type": "Vegetarian", "items": ["Biban / Paste", "Halloumi grătar", "Tocăniță năut", "Specialitate italiană", "Cașcaval pane"] },
+        { "type": "Salată", "items": ["Salată verde", "-", "Salată varză", "Mix legume", "Salată crudități"] },
+        { "type": "Gustare", "items": ["Focaccia", "Banana Bread", "Clătite", "Orez cu lapte", "Prăjitură vișine"] }
+      ]
+    },
+    "en": {
+      "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "rows": [
+        { "type": "Main Course", "items": ["Root Soup", "Alphabet Chicken Soup", "Rustic Borsch", "Beef Soup", "Meatball Soup"] },
+        { "type": "Vegetarian", "items": ["Root Soup", "Oltenian Soup", "Rustic Borsch", "Veg Soup", "Lentil Soup"] },
+        { "type": "Second Course", "items": ["Seabass", "Mediterranean Chicken", "Turkey Stew", "Italian Special", "Breaded Cheese"] },
+        { "type": "Vegetarian", "items": ["Seabass / Pasta", "Grilled Halloumi", "Chickpea Stew", "Italian Special", "Breaded Cheese"] },
+        { "type": "Salad", "items": ["Green Salad", "-", "Cabbage Salad", "Veg Mix", "Raw Salad"] },
+        { "type": "Snack", "items": ["Focaccia", "Banana Bread", "Pancakes", "Rice Pudding", "Cherry Cake"] }
+      ]
+    }
+  }
+};
+
+        // --- 4. CONFIGURARE ---
+        let currentLang = 'ro';
+        let activeWeekIndex = 0; // 0 = Săptămâna curentă
+        let newGeneratedData = null; // Pentru stocare temporară admin
+
+        // --- 5. FUNCȚII DATE (CALENDAR) ---
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function formatDate(date) {
+            let d = date.getDate().toString().padStart(2, '0');
+            let m = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${d}.${m}`;
+        }
+
+        function updateButtons() {
+            let today = new Date();
+            let startOfWeek = getMonday(today);
+
+            for (let i = 0; i < 4; i++) {
+                let s = new Date(startOfWeek);
+                s.setDate(startOfWeek.getDate() + (i * 7));
+                let e = new Date(s);
+                e.setDate(s.getDate() + 4); // Vineri
+
+                let btn = document.getElementById(`btnW${i}`);
+                if (btn) {
+                    btn.textContent = `${formatDate(s)} - ${formatDate(e)}`;
+                    
+                    // Logică simplă pentru a mapa data la S1-S4 din baza de date
+                    // Aici presupunem o rotație simplă S1->S2->S3->S4. 
+                    // Pentru o rotație reală infinită, e nevoie de o logică mai complexă, 
+                    // dar momentan mapăm butoanele fix la cheile S1-S4.
+                }
+            }
+        }
+
+        // --- 6. RENDER MENU ---
+        function renderMenu() {
+            // Mapăm butonul 0 la S1, 1 la S2 etc.
+            // Dacă vrei să se rotească logic, se poate modifica aici.
+            let dbKey = `S${activeWeekIndex + 1}`; 
+            
+            const data = menuData[dbKey] ? menuData[dbKey][currentLang] : null;
+
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+
+            if (!data) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Date indisponibile pentru această săptămână.</td></tr>`;
+                return;
+            }
+
+            // HEADER
+            thead.innerHTML = `<th>${currentLang === 'ro' ? 'Categorie' : 'Course'}</th>`;
+            data.days.forEach(day => {
+                let th = document.createElement('th');
+                th.textContent = day;
+                thead.appendChild(th);
+            });
+
+            // BODY
+            tbody.innerHTML = '';
+            data.rows.forEach(row => {
+                let tr = document.createElement('tr');
+                
+                // Verificare pentru colorare rând Salată
+                if (row.type.toLowerCase().includes('salat') || row.type.toLowerCase().includes('salad')) {
+                    tr.classList.add('row-salad');
+                }
+
+                let tdType = document.createElement('td');
+                tdType.innerHTML = row.type;
+                tr.appendChild(tdType);
+
+                row.items.forEach(item => {
+                    let td = document.createElement('td');
+                    td.textContent = item || '-';
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+
+            // Update Butoane Active
+            document.querySelectorAll('.week-btn').forEach((btn, idx) => {
+                if (idx === activeWeekIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+
+        function setWeek(index) {
+            activeWeekIndex = index;
+            renderMenu();
+        }
+
+        function toggleLang() {
+            currentLang = (currentLang === 'ro') ? 'en' : 'ro';
+            document.getElementById('btnLang').textContent = (currentLang === 'ro') ? 'RO / EN' : 'EN / RO';
+            renderMenu();
+        }
+
+        // --- 7. ADMIN PANEL LOGIC ---
+        function openAdmin() {
+            let pass = prompt("Parola Administrator:");
+            if (pass === "questfield") {
+                document.getElementById('adminModal').style.display = 'block';
+            } else if (pass !== null) {
+                alert("Parolă incorectă!");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        // Procesare Fișier Uploadat
+        document.getElementById('excelFile').addEventListener('change', function(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = file.name;
+            
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data = new Uint8Array(e.target.result);
+                    let workbook = XLSX.read(data, {type: 'array'});
+                    
+                    let processedData = processWorkbook(workbook);
+                    
+                    if (processedData) {
+                        newGeneratedData = processedData;
+                        document.getElementById('statusMessage').innerHTML = '';
+                        document.getElementById('saveAction').style.display = 'block';
+                        
+                        // Preview instantaneu
+                        Object.assign(menuData, processedData);
+                        renderMenu();
+                    }
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('statusMessage').innerHTML = '<span style="color:red">Eroare la citire. Verifică formatul.</span>';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Magia de citire a Excel-ului (Caută sheet-uri S1, S2...)
+        function processWorkbook(workbook) {
+            let newData = {};
+            let sheets = workbook.SheetNames;
+
+            sheets.forEach(sheetName => {
+                // Acceptăm doar sheet-uri care încep cu "S" (ex: S1, S2, S3, S4)
+                if (sheetName.toUpperCase().startsWith("S")) {
+                    let ws = workbook.Sheets[sheetName];
+                    let json = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+                    
+                    // Căutăm structura (Luni / Monday)
+                    let roIdx = -1, enIdx = -1;
+                    json.forEach((row, i) => {
+                        let str = JSON.stringify(row).toLowerCase();
+                        if (str.includes("luni")) roIdx = i;
+                        if (str.includes("monday")) enIdx = i;
+                    });
+
+                    if (roIdx !== -1 && enIdx !== -1) {
+                        newData[sheetName] = {
+                            ro: extractBlock(json, roIdx),
+                            en: extractBlock(json, enIdx)
+                        };
+                    }
+                }
+            });
+            return Object.keys(newData).length > 0 ? newData : null;
+        }
+
+        function extractBlock(json, startRow) {
+            let header = json[startRow];
+            let days = header.slice(1, 6).filter(d => d); // Coloanele 1-5 sunt zilele
+            let rows = [];
+            
+            let i = startRow + 1;
+            // Citim maxim 6 rânduri (Fel 1, Veg, Fel 2, Veg, Salata, Gustare)
+            while (i < json.length && rows.length < 6) {
+                let row = json[i];
+                if (row && row[0]) {
+                    rows.push({
+                        type: row[0],
+                        items: row.slice(1, 6)
+                    });
+                }
+                i++;
+            }
+            return { days, rows };
+        }
+
+        // --- 8. GENERARE FIȘIER NOU (UPDATE) ---
+        function downloadUpdatedPage() {
+            if (!newGeneratedData) return;
+
+            // Luăm codul HTML curent
+            let htmlContent = document.documentElement.outerHTML;
+
+            // Creăm string-ul cu noul obiect JSON
+            let newJSONString = `const menuData = ${JSON.stringify(newGeneratedData, null, 2)};`;
+
+            // Înlocuim variabila veche menuData cu cea nouă folosind Regex
+            // Căutăm "const menuData = { ... };"
+            let updatedHTML = htmlContent.replace(/const menuData\s*=\s*\{[\s\S]*?\};/, newJSONString);
+
+            // Creăm blob-ul pentru descărcare
+            let blob = new Blob([updatedHTML], {type: "text/html"});
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "index.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert("Fișierul index.html actualizat a fost descărcat!\n\nPASUL URMĂTOR: Intră pe GitHub și încarcă acest fișier nou peste cel vechi.");
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            updateButtons();
+            renderMenu();
+        };
+
+    </script>
 </body>
 </html>
