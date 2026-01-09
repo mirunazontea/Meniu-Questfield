@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meniu Questfield</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <link rel="stylesheet" href="style.css">
@@ -14,63 +14,62 @@
 </head>
 <body>
 
-    <header>
-        <h1 id="mainTitle">Meniu Questfield</h1>
-        <h2 id="subTitle">Săptămâna 1</h2>
-    </header>
+    <div class="main-container">
+        <header>
+            <h1>MENIUL SĂPTĂMÂNAL</h1>
+        </header>
 
-    <div class="controls">
-        <div class="week-selector">
-            <button onclick="setWeek('S1')" id="btnS1" class="active">Săptămâna 1</button>
-            <button onclick="setWeek('S2')" id="btnS2">Săptămâna 2</button>
-            <button onclick="setWeek('S3')" id="btnS3">Săptămâna 3</button>
-            <button onclick="setWeek('S4')" id="btnS4">Săptămâna 4</button>
+        <div class="week-tabs">
+            <button onclick="setWeek('S1')" id="btnS1" class="tab-btn active">Săptămâna 1</button>
+            <button onclick="setWeek('S2')" id="btnS2" class="tab-btn">Săptămâna 2</button>
+            <button onclick="setWeek('S3')" id="btnS3" class="tab-btn">Săptămâna 3</button>
+            <button onclick="setWeek('S4')" id="btnS4" class="tab-btn">Săptămâna 4</button>
         </div>
-        
-        <div class="lang-selector">
-            <button onclick="toggleLang()" id="btnLang" class="action-btn">RO / EN</button>
-        </div>
-    </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr id="tableHeaders">
-                    </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
+        <div class="lang-container">
+            <button onclick="toggleLang()" id="btnLang" class="lang-btn">RO / EN</button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr id="tableHeaders">
+                        </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <footer>
-        <p>&copy; 2024 Questfield. Toate drepturile rezervate.</p>
-        <div class="admin-trigger" onclick="openAdminPanel()">
-            <i class="fas fa-lock"></i> Admin
+        <div class="admin-lock" onclick="openAdminPanel()">
+            <i class="fas fa-lock"></i>
         </div>
+        <p>&copy; Questfield</p>
     </footer>
 
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeAdminPanel()">&times;</span>
-            <h3>Administrare Meniu</h3>
-            <p>Încarcă fișierul Excel pentru a actualiza meniul.</p>
+            <h3>Actualizare Meniu</h3>
+            <p>Selectează fișierul Excel (format .xlsx)</p>
             
-            <div class="upload-area">
+            <div class="upload-box">
                 <input type="file" id="excelInput" accept=".xlsx, .xls" />
-                <label for="excelInput" class="upload-btn">
-                    <i class="fas fa-file-excel"></i> Alege Fișier Excel
+                <label for="excelInput" class="custom-file-upload">
+                    <i class="fas fa-upload"></i> Încarcă Excel
                 </label>
-                <span id="fileName">Niciun fișier ales</span>
+                <div id="fileName">Niciun fișier selectat</div>
             </div>
 
-            <div id="updateStatus" class="status-msg"></div>
+            <div id="statusMsg"></div>
 
-            <div class="instruction-box" id="saveInstruction" style="display:none;">
-                <p><strong><i class="fas fa-check-circle"></i> Date procesate cu succes!</strong></p>
-                <p>Deoarece site-ul este static, trebuie să salvăm noua configurație:</p>
-                <button onclick="downloadNewData()" class="save-btn">Descarcă data.js actualizat</button>
-                <p class="small-text">După descărcare, înlocuiește fișierul <code>data.js</code> de pe GitHub cu acesta.</p>
+            <div id="saveSection" style="display:none;">
+                <hr>
+                <p style="color: green; font-weight: bold;">Date citite corect!</p>
+                <p>Descarcă noul fișier <code>data.js</code> și încarcă-l pe GitHub:</p>
+                <button onclick="downloadNewData()" class="save-btn">Descarcă data.js</button>
             </div>
         </div>
     </div>
