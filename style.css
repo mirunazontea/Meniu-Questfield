@@ -1,99 +1,147 @@
 :root {
-    --navy: #1a2b4c;
-    --yellow: #f2bc1c;
-    --light-gray: #f4f7f6;
-    --white: #ffffff;
+    /* Paleta de culori inspirată de Questfield */
+    --primary-blue: #1C355E;   /* Albastru închis/Navy */
+    --accent-red: #E63946;     /* Roșu pentru accente */
+    --bg-color: #F4F7F6;       /* Gri foarte deschis pentru fundal */
+    --card-bg: #FFFFFF;        /* Alb pentru cartonașe */
+    --text-dark: #333333;
+    --text-light: #F4F7F6;
+    
+    /* Fonturi */
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Open Sans', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: var(--light-gray);
-    margin: 0;
-    color: var(--navy);
-}
-
-header {
-    background-color: var(--white);
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.logo { width: 180px; margin-bottom: 10px; }
-
-.week-selector {
+    background-color: var(--bg-color);
+    font-family: var(--font-body);
+    color: var(--text-dark);
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 30px 10px;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.tab-btn {
-    padding: 12px 25px;
-    border: 2px solid var(--navy);
-    background: transparent;
-    color: var(--navy);
-    font-weight: 700;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s;
+/* Header Styles */
+header {
+    background-color: var(--primary-blue);
+    color: var(--card-bg);
+    text-align: center;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.tab-btn.active, .tab-btn:hover {
-    background-color: var(--navy);
-    color: white;
+header h1 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
 }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+header h1 span {
+    color: var(--accent-red); /* Accentul roșu pe cuvântul Menu */
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Main Layout */
+main {
+    flex: 1;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 2rem;
+    width: 100%;
 }
 
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Menu Card Styles */
 .day-card {
-    background: var(--white);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    border-top: 5px solid var(--yellow);
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-top: 5px solid var(--accent-red); /* Linie roșie sus */
 }
 
-.day-card h3 {
-    margin-top: 0;
-    color: var(--navy);
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+.day-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-.dish { margin: 15px 0; font-size: 0.95em; }
-.label { font-weight: 600; display: block; color: #777; font-size: 0.8em; text-transform: uppercase; }
-
-/* Tooltip Alergeni */
-.allergen-trigger {
-    background: #fdf2f2;
-    color: #c0392b;
-    padding: 5px 12px;
-    border-radius: 5px;
-    font-size: 0.8em;
-    cursor: help;
-    display: inline-block;
-    position: relative;
-}
-
-.allergen-trigger:hover::after {
-    content: attr(data-info);
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 8px;
-    border-radius: 4px;
-    width: 150px;
+.card-header {
+    background-color: #EEF2F5;
+    padding: 1rem;
     text-align: center;
-    z-index: 100;
+    border-bottom: 1px solid #e0e0e0;
 }
+
+.card-header h2 {
+    font-family: var(--font-heading);
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.meal-item {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.meal-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    min-width: 25px;
+}
+
+.meal-details h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.meal-details p {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text-dark);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--primary-blue);
+    color: white;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    main {
+        padding: 1rem;
+    }
+}
+}
+
