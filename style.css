@@ -1,264 +1,206 @@
+/* Importăm fontul Montserrat pentru un aspect modern și profesional */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+:root {
+  /* Paleta de culori oficială Questfield */
+  --q-dark-blue: #0E2636;  /* Firefly - Albastrul închis principal */
+  --q-gold: #CE9F49;       /* Roti - Auriul de accent */
+  --q-white: #FFFFFF;
+  --q-bg-light: #FAFAFA;   /* Alabaster - Fundal ușor gri */
+  --q-text-grey: #333333;
+  --q-border: #E0E0E0;
+}
+
+/* Resetare de bază */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f9fafb;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--q-bg-light);
+  color: var(--q-text-grey);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  padding: 20px;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+/* Stiluri pentru Header și Titluri */
+h1 {
+  color: var(--q-dark-blue);
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-/* Header */
-.header {
-    background-color: #1a3a5c;
-    color: white;
-    padding: 2rem 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+h2 {
+  color: var(--q-gold);
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  display: inline-block;
 }
 
-.header h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 0.5rem;
+/* Linie decorativă sub subtitlu */
+h2::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background-color: var(--q-dark-blue);
+  margin: 8px auto 0;
+  border-radius: 2px;
 }
 
-.header p {
-    text-align: center;
-    font-size: 1.125rem;
-    opacity: 0.9;
+/* Container pentru controale (Butoane) */
+.controls, div[style*="text-align: center"] {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-/* Navigation */
-.navigation {
-    background-color: white;
-    padding: 1.5rem 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-top: 4px solid #e85d2a;
+/* Stiluri Butoane - PROFI */
+button {
+  background-color: var(--q-dark-blue);
+  color: var(--q-white);
+  border: none;
+  padding: 12px 24px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(14, 38, 54, 0.1);
 }
 
-.nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
+button:hover {
+  background-color: var(--q-gold);
+  color: var(--q-dark-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(206, 159, 73, 0.2);
 }
 
-.nav-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background-color: #1a3a5c;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
+button:active {
+  transform: translateY(0);
 }
 
-.nav-button:hover {
-    background-color: #2d4a6d;
+/* Stiluri Tabel */
+table {
+  width: 100%;
+  max-width: 1000px;
+  border-collapse: collapse;
+  background-color: var(--q-white);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden; /* Pentru colțurile rotunjite */
+  margin-bottom: 40px;
 }
 
-.week-info {
-    text-align: center;
-    flex: 1;
+/* Header Tabel */
+thead {
+  background-color: var(--q-dark-blue);
+  color: var(--q-white);
 }
 
-.week-dates {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #1a3a5c;
+th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
 }
 
-.current-week-badge {
-    color: #e85d2a;
-    font-weight: 600;
-    font-size: 1.125rem;
-    margin-top: 0.25rem;
+/* Celule Tabel */
+td {
+  padding: 15px;
+  border-bottom: 1px solid var(--q-border);
+  font-size: 0.95rem;
+  vertical-align: top;
 }
 
-.go-to-current {
-    color: #e85d2a;
-    font-weight: 600;
-    font-size: 0.875rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: underline;
-    margin-top: 0.25rem;
+/* Efect zebra pentru rânduri */
+tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
 }
 
-.go-to-current:hover {
-    opacity: 0.8;
+tbody tr:hover {
+  background-color: #f0f4f8; /* Un albastru foarte deschis la hover */
 }
 
-/* Main Content */
-.main-content {
-    flex: 1;
-    padding: 2rem 1rem;
+/* Stiluri specifice pentru coloana Categorie (prima coloană) */
+td:first-child {
+  font-weight: 700;
+  color: var(--q-dark-blue);
+  width: 150px;
+  border-right: 1px solid var(--q-border);
 }
 
-.loading {
-    text-align: center;
-    padding: 3rem 0;
+/* Mesaje de Loading și Eroare */
+#loading {
+  font-size: 1.2rem;
+  color: var(--q-gold);
+  font-weight: 600;
+  margin: 20px 0;
+  text-align: center;
 }
 
-.spinner {
-    display: inline-block;
-    width: 3rem;
-    height: 3rem;
-    border: 4px solid #e85d2a;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading p {
-    margin-top: 1rem;
-    color: #6b7280;
-}
-
-.error {
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.error p {
-    color: #dc2626;
-}
-
-/* Menu Table */
-.menu-table-container {
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
-.menu-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.menu-table thead tr {
-    background-color: #1a3a5c;
-    color: white;
-}
-
-.menu-table th {
-    padding: 1rem 1.5rem;
-    text-align: left;
-    font-weight: 600;
-}
-
-.category-header {
-    border-right: 2px solid #2d4a6d;
-}
-
-.menu-table tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-}
-
-.menu-table tbody tr:nth-child(odd) {
-    background-color: white;
-}
-
-.menu-table td {
-    padding: 1rem 1.5rem;
-    color: #374151;
-}
-
-.menu-table td:first-child {
-    font-weight: bold;
-    color: #1a3a5c;
-    border-right: 2px solid #e5e7eb;
+#error {
+  color: #dc3545; /* Roșu standard pentru erori */
+  background-color: #ffe6e6;
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: 1px solid #ffcccc;
+  margin: 20px 0;
+  text-align: center;
 }
 
 /* Footer */
-.footer {
-    background-color: #1a3a5c;
-    color: white;
-    padding: 2rem 1rem;
-    margin-top: 3rem;
+footer {
+  margin-top: auto;
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  width: 100%;
+  background-color: var(--q-white);
 }
 
-.footer-content {
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.footer-content p {
-    opacity: 0.9;
-    margin-bottom: 0.5rem;
-}
-
-.footer-contact {
-    font-size: 0.875rem;
-    opacity: 0.75;
-}
-
-.footer-copyright {
-    text-align: center;
-    padding-top: 1rem;
-    border-top: 1px solid #2d4a6d;
-}
-
-.footer-copyright p {
-    font-size: 0.875rem;
-    opacity: 0.75;
-}
-
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.75rem;
-    }
-
-    .header p {
-        font-size: 1rem;
-    }
-
-    .nav-container {
-        flex-direction: column;
-    }
-
-    .week-info {
-        order: -1;
-        width: 100%;
-    }
-
-    .nav-button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .menu-table th,
-    .menu-table td {
-        padding: 0.75rem;
-        font-size: 0.875rem;
-    }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.2rem; }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .controls {
+    flex-direction: column;
+  }
 }
-  margin-left: 4px;
-}
+
 
