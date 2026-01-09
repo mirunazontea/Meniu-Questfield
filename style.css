@@ -1,231 +1,199 @@
-/* --- QUESTFIELD STYLE SYSTEM --- */
+/* --- QUESTFIELD EXACT STYLE --- */
 :root {
-    --q-dark-blue: #0E2636;  /* Firefly */
-    --q-gold: #CE9F49;       /* Roti */
-    --q-white: #FFFFFF;
-    --q-bg-light: #FAFAFA;   /* Alabaster */
-    --q-text-grey: #333333;
-    --q-border: #E0E0E0;
-    --q-green: #e2efda;      /* Pentru rândul Salată */
+    --q-blue: #00204a;      /* Albastrul închis Questfield */
+    --q-gold: #eebf3f;      /* Galbenul specific */
+    --q-green: #e2efda;     /* Verdele palid pentru salată */
+    --q-text: #333333;
+    --q-bg: #ffffff;
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: var(--q-bg-light);
-    color: var(--q-text-grey);
-    line-height: 1.6;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    color: var(--q-text);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
     align-items: center;
-    padding: 20px;
+    min-height: 100vh;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    background: white;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
 /* HEADER */
-header { margin-bottom: 2rem; text-align: center; }
-
-h1 {
-    color: var(--q-dark-blue);
+header h1 {
+    color: var(--q-blue);
     font-weight: 700;
-    font-size: 2rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
-
-h2 {
-    color: var(--q-gold);
-    font-weight: 600;
-    font-size: 1.5rem;
-    position: relative;
-    display: inline-block;
-}
-h2::after {
-    content: ''; display: block; width: 50px; height: 3px;
-    background-color: var(--q-dark-blue);
-    margin: 8px auto 0; border-radius: 2px;
-}
-
-/* CONTROLS */
-.controls {
-    display: flex;
-    gap: 15px;
+    font-size: 24px;
     margin-bottom: 25px;
-    flex-wrap: wrap;
+    text-align: center;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--q-gold);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+header { text-align: center; }
+
+/* TABURI SĂPTĂMÂNI */
+.week-tabs {
+    display: flex;
     justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-button {
-    background-color: var(--q-dark-blue);
-    color: var(--q-white);
-    border: none;
-    padding: 12px 24px;
+.tab-btn {
+    background: transparent;
+    border: 1px solid var(--q-blue);
+    color: var(--q-blue);
+    padding: 10px 20px;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(14, 38, 54, 0.1);
+    transition: all 0.3s;
+    font-size: 14px;
 }
 
-button:hover {
-    background-color: var(--q-gold);
-    color: var(--q-dark-blue);
-    transform: translateY(-2px);
+.tab-btn:hover {
+    background-color: #f0f4f8;
 }
 
-button.active {
-    background-color: var(--q-gold);
-    color: var(--q-dark-blue);
+.tab-btn.active {
+    background-color: var(--q-blue);
+    color: white;
 }
 
-.action-btn { border: 2px solid var(--q-gold); }
+/* BUTON LIMBĂ */
+.lang-container {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.lang-btn {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    color: #555;
+}
+.lang-btn:hover { border-color: var(--q-blue); color: var(--q-blue); }
 
 /* TABEL */
-.table-container {
-    width: 100%;
-    max-width: 1200px;
+.table-responsive {
     overflow-x: auto;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    background: white;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    margin-top: 10px;
 }
 
-thead { background-color: var(--q-dark-blue); color: var(--q-white); }
-
-th { padding: 15px; text-align: center; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+th {
+    background-color: var(--q-blue);
+    color: white;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #000; /* Bordura neagră stil Excel */
+}
 
 td {
-    padding: 15px;
-    border-bottom: 1px solid var(--q-border);
-    font-size: 0.95rem;
+    padding: 12px;
+    border: 1px solid #000;
     vertical-align: middle;
     text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
-/* Stiluri specifice */
+/* Prima coloană (Categorii) */
 td:first-child {
-    font-weight: 700;
-    color: var(--q-dark-blue);
-    width: 150px;
-    border-right: 1px solid var(--q-border);
+    background-color: var(--q-blue);
+    color: white;
+    font-weight: bold;
     text-align: left;
-    background-color: #fcfcfc;
+    width: 150px;
 }
 
-/* Zebra striping */
-tbody tr:nth-child(even) { background-color: #f8f9fa; }
-tbody tr:hover { background-color: #f0f4f8; }
-
-/* Rândul Salată (Specific Questfield) */
-tbody tr.row-salata td:not(:first-child) {
+/* Rândul Salată */
+tr.row-salata td:not(:first-child) {
     background-color: var(--q-green);
 }
 
-/* FOOTER & ADMIN */
+/* ADMIN FOOTER */
 footer {
     margin-top: auto;
-    width: 100%;
+    padding-top: 20px;
     text-align: center;
-    padding: 20px;
-    font-size: 0.8rem;
-    color: #666;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+    font-size: 12px;
+    color: #999;
 }
 
-.admin-trigger {
+.admin-lock {
     cursor: pointer;
-    opacity: 0.3;
+    margin-bottom: 5px;
+    opacity: 0.2;
     transition: opacity 0.3s;
 }
-.admin-trigger:hover { opacity: 1; color: var(--q-dark-blue); }
+.admin-lock:hover { opacity: 1; color: var(--q-blue); }
 
-/* ADMIN MODAL */
+/* MODAL */
 .modal {
-    display: none; 
-    position: fixed; z-index: 1000;
+    display: none;
+    position: fixed; z-index: 999;
     left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    backdrop-filter: blur(5px);
+    background-color: rgba(0,0,0,0.6);
 }
-
 .modal-content {
     background-color: white;
     margin: 10% auto;
     padding: 30px;
-    border-radius: 8px;
     width: 90%;
-    max-width: 500px;
-    position: relative;
+    max-width: 450px;
     text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    position: relative;
 }
-
 .close-btn {
-    position: absolute; right: 20px; top: 15px;
-    font-size: 28px; cursor: pointer; color: #aaa;
+    position: absolute; right: 15px; top: 10px;
+    font-size: 24px; cursor: pointer;
 }
-.close-btn:hover { color: #000; }
-
-.upload-area {
-    margin: 20px 0;
-    padding: 30px;
-    border: 2px dashed var(--q-border);
-    border-radius: 8px;
-    background-color: #fafafa;
-}
-
-input[type="file"] { display: none; }
-
-.upload-btn {
+.custom-file-upload {
+    border: 2px dashed #ccc;
     display: inline-block;
-    background-color: var(--q-dark-blue);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 20px 40px;
     cursor: pointer;
-    font-weight: 600;
-}
-.upload-btn:hover { background-color: var(--q-gold); color: var(--q-dark-blue); }
-
-#fileName { display: block; margin-top: 10px; font-style: italic; color: #666; }
-
-.instruction-box {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #e8f5e9;
-    border-radius: 4px;
-    border: 1px solid #c8e6c9;
-    color: #2e7d32;
-}
-
-.save-btn {
     margin-top: 10px;
-    background-color: #2e7d32;
-    width: 100%;
+    font-weight: bold;
+    color: var(--q-blue);
 }
-.save-btn:hover { background-color: #1b5e20; transform: none; color: white; }
+.custom-file-upload:hover { background: #f9f9f9; border-color: var(--q-blue); }
+input[type="file"] { display: none; }
+.save-btn {
+    background: green; color: white; border: none;
+    padding: 10px 20px; margin-top: 15px; cursor: pointer;
+    font-size: 16px; font-weight: bold;
+}
 
-.small-text { font-size: 0.75rem; margin-top: 5px; color: #555; }
-
-/* Responsive */
+/* MOBILE */
 @media (max-width: 768px) {
-    h1 { font-size: 1.5rem; }
-    .controls { flex-direction: column; }
-    button { width: 100%; }
+    .week-tabs { flex-direction: column; }
+    .tab-btn { width: 100%; }
+    th, td { font-size: 12px; padding: 8px; }
 }
