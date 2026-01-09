@@ -1,42 +1,46 @@
-// Configuration
+/**
+ * QUESTFIELD MENU SCRIPT
+ * Varianta: Date traduse direct în Google Sheet (Coloane A-F = RO, G-L = EN)
+ */
+
+// --- 1. CONFIGURARE ---
 const CONFIG = {
     SHEET_ID: '1RpPfd-5vti-R4TBKCusr1gok-O7eTSdC42be_YlwSkA',
-    API_KEY: 'YOUR_API_KEY_HERE', 
-    RANGE: 'Sheet1!A:L' // NOTĂ: Am extins range-ul (A:F era doar RO, A:L prinde și EN)
+    API_KEY: 'PUNE_AICI_CHEIA_TA_API_GOOGLE', // <--- IMPORTANT: PUNE CHEIA TA AICI
+    // Modifică 'Sheet1' cu numele exact al tab-ului din Excel dacă e diferit (ex: 'Meniu')
+    RANGE: 'Sheet1!A:L' 
 };
 
-// Translations Dictionary
+// --- 2. TEXTE UI (Interfață) ---
 const TRANSLATIONS = {
     ro: {
         loading: "Se încarcă meniul...",
-        error: "Nu s-au putut încărca datele meniului.",
+        error: "Nu s-au putut încărca datele. Verifică API Key sau conexiunea.",
         prevWeek: "Săpt. Anterioară",
         nextWeek: "Săpt. Următoare",
         currentBadge: "Săptămâna Curentă",
         backToCurrent: "Înapoi la Săptămâna Curentă",
         dateFormat: 'ro-RO',
-        // Header-ele tabelului
         headers: ['Categorie', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri']
     },
     en: {
         loading: "Loading menu...",
-        error: "Could not load menu data.",
+        error: "Could not load menu data. Check API Key or connection.",
         prevWeek: "Previous Week",
         nextWeek: "Next Week",
         currentBadge: "Current Week",
         backToCurrent: "Back to Current Week",
         dateFormat: 'en-GB',
-        // Header-ele tabelului
         headers: ['Category', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     }
 };
 
-// State
+// --- 3. STATE ---
 let currentWeekOffset = 0;
-let currentLanguage = 'ro'; // 'ro' sau 'en'
-let cachedMenuData = null; // Stocăm datele ca să nu le cerem de 2 ori când schimbăm limba
+let currentLanguage = 'ro'; 
+let cachedMenuData = null; 
 
-// DOM Elements
+// --- 4. ELEMENTE DOM ---
 const elements = {
     prevWeek: document.getElementById('prevWeek'),
     nextWeek: document.getElementById('nextWeek'),
@@ -47,32 +51,24 @@ const elements = {
     error: document.getElementById('error'),
     menuTable: document.getElementById('menuTable'),
     menuTableBody: document.getElementById('menuTableBody'),
-    // Texte care trebuie traduse direct
-    loadingText: document.querySelector('#loading p'),
-    errorText: document.querySelector('#error p'),
-    prevWeekText: document.querySelector('#prevWeek .nav-text'),
-    nextWeekText: document.querySelector('#nextWeek .nav-text')
+    errorText: document.querySelector('#error p')
 };
 
-// --- Language Utilities ---
+// --- 5. LOGICĂ LIMBĂ & UI ---
 
 function changeLanguage(lang) {
     if (currentLanguage === lang) return;
-    
     currentLanguage = lang;
     
-    // 1. Actualizăm starea vizuală a butoanelor
+    // Update butoane
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`btn-${lang}`);
     if(activeBtn) activeBtn.classList.add('active');
 
-    // 2. Actualizăm textele statice din UI
+    // Update texte statice și tabel
     updateStaticTexts();
-
-    // 3. Re-randăm datele (data, tabelul)
     updateWeekDisplay();
     
-    // Dacă avem deja datele încărcate, doar reconstruim tabelul
     if (cachedMenuData) {
         renderMenuTable(cachedMenuData);
     } else {
@@ -83,12 +79,11 @@ function changeLanguage(lang) {
 function updateStaticTexts() {
     const t = TRANSLATIONS[currentLanguage];
     
-    // Update texte folosind data-i18n (din HTML-ul nou)
+    // Traduceri elemente cu data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        // Mapăm cheile din HTML la structura noastră de traduceri
+        // Mapare simplă
         const map = {
-            'subtitle': 'subtitle', // Trebuie adăugat în TRANSLATIONS dacă e cazul
             'loading': 'loading',
             'error': 'error',
             'prevWeek': 'prevWeek',
@@ -96,21 +91,17 @@ function updateStaticTexts() {
             'currentWeekBadge': 'currentBadge',
             'backToCurrent': 'backToCurrent'
         };
-        
-        if (map[key] && t[map[key]]) {
-            el.textContent = t[map[key]];
-        }
+        if (map[key] && t[map[key]]) el.textContent = t[map[key]];
     });
 
-    // Update headers tabel
+    // Header tabel
     const ths = document.querySelectorAll('.menu-table thead th');
     t.headers.forEach((text, index) => {
         if (ths[index]) ths[index].textContent = text;
     });
 }
 
-// --- Date Utilities ---
-
+// --- 6. DATE & TIMP ---
 function getMondayOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -120,10 +111,7 @@ function getMondayOfWeek(date) {
 
 function formatDate(date) {
     const locale = TRANSLATIONS[currentLanguage].dateFormat;
-    return date.toLocaleDateString(locale, {
-        day: '2-digit',
-        month: 'short' // "Ian" vs "Jan"
-    });
+    return date.toLocaleDateString(locale, { day: '2-digit', month: 'short' });
 }
 
 function getFridayOfWeek(monday) {
@@ -139,16 +127,12 @@ function getCurrentWeekMonday() {
     return monday;
 }
 
-// --- UI Updates ---
-
 function updateWeekDisplay() {
     const monday = getCurrentWeekMonday();
     const friday = getFridayOfWeek(monday);
-    const isCurrentWeek = currentWeekOffset === 0;
-
     elements.weekDates.textContent = `${formatDate(monday)} - ${formatDate(friday)}`;
     
-    if (isCurrentWeek) {
+    if (currentWeekOffset === 0) {
         elements.currentWeekBadge.style.display = 'block';
         elements.goToCurrentWeek.style.display = 'none';
     } else {
@@ -175,51 +159,74 @@ function showMenu() {
     elements.menuTable.style.display = 'block';
 }
 
-// --- Data Loading ---
+// --- 7. ÎNCĂRCARE DATE (LOGICA NOUĂ) ---
 
 async function loadMenuData() {
     showLoading();
-    
+
+    if (CONFIG.API_KEY.includes('PUNE_AICI')) {
+        console.error("API KEY LIPSEȘTE");
+        elements.errorText.textContent = "Lipsește API Key din fișierul script.js";
+        showError();
+        return;
+    }
+
     try {
-        // --- SIMULARE DATA ---
-        // Aici presupunem că Sheet-ul are coloanele A-F pentru RO și G-L pentru EN
+        // Cerem coloanele A:L (A-F = RO, G-L = EN)
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.RANGE}?key=${CONFIG.API_KEY}`;
         
-        // Mock data cu structură dublă (imaginează-ți că asta vine din sheet)
-        const mockResponse = {
-            // Structura: Categorie, Luni, Marti, Miercuri, Joi, Vineri
-            ro: [
-                ['Supă', 'Supă cremă de legume', 'Ciorbă de burtă', 'Supă cremă de ciuperci', 'Ciorbă țărănească', 'Supă cremă de roșii'],
-                ['Fel Principal', 'Pui la grătar', 'Mușchi file', 'Somon la cuptor', 'Cotlet de porc', 'Paste carbonara'],
-                ['Vegetarian', 'Salată Caesar', 'Tocăniță legume', 'Chiftele quinoa', 'Schnițel soia', 'Pizza Margherita'],
-                ['Desert', 'Prăjitură', 'Clătite', 'Fructe', 'Tiramisu', 'Papanași']
-            ],
-            en: [
-                ['Soup', 'Vegetable Cream Soup', 'Tripe Soup', 'Mushroom Cream Soup', 'Peasant Soup', 'Tomato Cream Soup'],
-                ['Main Course', 'Grilled Chicken', 'Pork Fillet', 'Baked Salmon', 'Pork Chop', 'Carbonara Pasta'],
-                ['Vegetarian', 'Caesar Salad', 'Veggie Stew', 'Quinoa Meatballs', 'Soy Schnitzel', 'Margherita Pizza'],
-                ['Dessert', 'Cake', 'Pancakes', 'Fruits', 'Tiramisu', 'Donuts']
-            ]
-        };
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
-        // Simulare delay rețea
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Salvăm datele
-        cachedMenuData = mockResponse;
-        
+        const result = await response.json();
+        const rows = result.values;
+
+        const roData = [];
+        const enData = [];
+
+        if (rows && rows.length > 0) {
+            rows.forEach(row => {
+                // Verificăm dacă rândul are date
+                if (row.length > 0) {
+                    
+                    // --- EXTRAGERE ROMÂNĂ (Coloanele 0-5 / A-F) ---
+                    // slice(0, 6) ia elementele de la index 0 la 5
+                    const roRow = row.slice(0, 6);
+                    
+                    // --- EXTRAGERE ENGLEZĂ (Coloanele 6-11 / G-L) ---
+                    // slice(6, 12) ia elementele de la index 6 la 11
+                    let enRow = row.slice(6, 12);
+
+                    // Validare: Dacă partea de RO are conținut (măcar categoria)
+                    if (roRow[0]) {
+                        roData.push(roRow);
+
+                        // Dacă partea de EN e goală sau incompletă, folosim RO ca fallback 
+                        // sau afișăm ce am găsit (chiar dacă e gol)
+                        if (enRow.length > 0 && enRow[0]) {
+                            enData.push(enRow);
+                        } else {
+                            // Opțional: Dacă lipsește engleza în Excel, copiem româna să nu fie gol tabelul
+                            enData.push(roRow); 
+                        }
+                    }
+                }
+            });
+        }
+
+        cachedMenuData = { ro: roData, en: enData };
         renderMenuTable(cachedMenuData);
         showMenu();
         
     } catch (err) {
         console.error('Error loading menu data:', err);
+        elements.errorText.textContent = TRANSLATIONS[currentLanguage].error;
         showError();
     }
 }
 
 function renderMenuTable(data) {
     elements.menuTableBody.innerHTML = '';
-    
-    // Alegem setul de date corect pe baza limbii
     const activeData = (currentLanguage === 'ro') ? data.ro : data.en;
     
     if (!activeData || activeData.length === 0) {
@@ -230,53 +237,23 @@ function renderMenuTable(data) {
     activeData.forEach(row => {
         const tr = document.createElement('tr');
         
-        // Prima celulă este Categoria (header de rând)
-        const th = document.createElement('th'); // Folosim TH pentru prima coloană (categorie)
-        th.textContent = row[0]; // Categoria
+        // Categoria (Prima coloană din setul de 6)
+        const th = document.createElement('th');
+        th.textContent = row[0] || "";
         th.className = 'row-header';
         tr.appendChild(th);
 
-        // Restul celulelor (Zilele săptămânii)
-        for (let i = 1; i < row.length; i++) {
+        // Zilele (Următoarele 5 coloane)
+        for (let i = 1; i < 6; i++) {
             const td = document.createElement('td');
-            td.textContent = row[i];
-            // Putem adăuga logica pentru data attributes aici (pentru mobile view cu CSS content)
-            td.setAttribute('data-label', TRANSLATIONS[currentLanguage].headers[i]);
+            td.textContent = row[i] || "-"; // Linie dacă e gol
+            if(TRANSLATIONS[currentLanguage].headers[i]) {
+                td.setAttribute('data-label', TRANSLATIONS[currentLanguage].headers[i]);
+            }
             tr.appendChild(td);
         }
-        
-        elements.menuTableBody.appendChild(tr);
-    });
-}
+        elements.
 
-// --- Event Listeners ---
-
-elements.prevWeek.addEventListener('click', () => {
-    currentWeekOffset--;
-    updateWeekDisplay();
-    loadMenuData(); // În realitate aici ai reîncărca din API cu altă dată
-});
-
-elements.nextWeek.addEventListener('click', () => {
-    currentWeekOffset++;
-    updateWeekDisplay();
-    loadMenuData();
-});
-
-elements.goToCurrentWeek.addEventListener('click', () => {
-    currentWeekOffset = 0;
-    updateWeekDisplay();
-    loadMenuData();
-});
-
-// --- Initialize ---
-// Facem funcția changeLanguage globală pentru a putea fi apelată din HTML onclick="..."
-window.changeLanguage = changeLanguage;
-
-// Pornire inițială
-updateStaticTexts();
-updateWeekDisplay();
-loadMenuData();
 
 
 
