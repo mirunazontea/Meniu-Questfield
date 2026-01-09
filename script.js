@@ -194,5 +194,3 @@ document.addEventListener('DOMContentLoaded', () => {
     generateDateLabels(); // Generăm datele pe butoane
     renderMenu();         // Afișăm tabelul
 });
-// Init
-document.addEventListener('DOMContentLoaded', renderMenu);
