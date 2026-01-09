@@ -1,33 +1,14 @@
-// CONFIGURARE
 let currentWeek = 'S1';
 let currentLang = 'ro';
-let generatedData = null; // Stochează datele noi până la salvare
+let generatedData = null;
 
-// --- LOGICA DE AFIȘARE ---
+// RENDER MENIU
 function renderMenu() {
-    // Folosim datele din variabila globală menuData (din data.js)
-    // Sau din localStorage dacă am testat ceva local
-    let dataToUse = menuData;
-    
-    // Verificăm datele
-    if (!dataToUse[currentWeek] || !dataToUse[currentWeek][currentLang]) {
-        console.error("Date lipsă pentru", currentWeek, currentLang);
-        return;
-    }
-
-    const data = dataToUse[currentWeek][currentLang];
-    
-    // Actualizare Titluri
-    document.getElementById('subTitle').textContent = currentLang === 'ro' 
-        ? `Săptămâna ${currentWeek.replace('S', '')}` 
-        : `Week ${currentWeek.replace('S', '')}`;
-
-    document.getElementById('mainTitle').textContent = currentLang === 'ro' 
-        ? "Meniu Questfield" 
-        : "Questfield Menu";
-
-    // Header Tabel
+    const data = menuData[currentWeek][currentLang];
     const headers = document.getElementById('tableHeaders');
+    const body = document.getElementById('tableBody');
+
+    // Header
     headers.innerHTML = `<th>${currentLang === 'ro' ? 'Categorie' : 'Course'}</th>`;
     data.days.forEach(day => {
         const th = document.createElement('th');
@@ -35,38 +16,35 @@ function renderMenu() {
         headers.appendChild(th);
     });
 
-    // Body Tabel
-    const body = document.getElementById('tableBody');
+    // Body
     body.innerHTML = '';
-    
     data.rows.forEach(row => {
         const tr = document.createElement('tr');
         
-        // Verificăm dacă e rândul de Salată pentru a-l colora (logică CSS)
-        if(row.type.includes("Salat") || row.type.includes("Salad")) {
+        // Verifică dacă e salată pentru stilizare
+        if(row.type.toLowerCase().includes('salat') || row.type.toLowerCase().includes('salad')) {
             tr.classList.add('row-salata');
         }
 
+        // Prima celulă (Categorie)
         const tdType = document.createElement('td');
-        tdType.innerHTML = `<strong>${row.type}</strong>`;
+        tdType.textContent = row.type;
         tr.appendChild(tdType);
 
+        // Celulele de mâncare
         row.items.forEach(item => {
             const td = document.createElement('td');
-            td.textContent = item || "-"; // Pune liniuță dacă e gol
+            td.textContent = item || '-';
             tr.appendChild(td);
         });
+
         body.appendChild(tr);
     });
 
-    // Actualizare Butoane Active
-    ['S1', 'S2', 'S3', 'S4'].forEach(w => {
-        const btn = document.getElementById(`btn${w}`);
-        if (btn) {
-            if(w === currentWeek) btn.classList.add('active');
-            else btn.classList.remove('active');
-        }
-    });
+    // Actualizare Tab-uri Active
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btn${currentWeek}`);
+    if(activeBtn) activeBtn.classList.add('active');
 }
 
 function setWeek(week) {
@@ -79,138 +57,116 @@ function toggleLang() {
     renderMenu();
 }
 
-// --- LOGICA DE ADMIN (UPLOAD EXCEL) ---
+// --- ADMIN & EXCEL LOGIC ---
 
-// 1. Deschidere Panou
 function openAdminPanel() {
-    const password = prompt("Introduceți parola de administrator:");
-    if (password === "questfield") { // Parolă simplă
-        document.getElementById('adminModal').style.display = "block";
-    } else if (password !== null) {
-        alert("Parolă incorectă!");
+    const pwd = prompt("Parola Admin:");
+    if(pwd === "questfield") {
+        document.getElementById('adminModal').style.display = 'block';
+    } else if(pwd) {
+        alert("Parola greșită");
     }
 }
 
 function closeAdminPanel() {
-    document.getElementById('adminModal').style.display = "none";
+    document.getElementById('adminModal').style.display = 'none';
 }
 
-// 2. Gestionare Upload
-document.getElementById('excelInput').addEventListener('change', handleFileSelect, false);
-
-function handleFileSelect(evt) {
-    const file = evt.target.files[0];
-    if (!file) return;
+document.getElementById('excelInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
 
     document.getElementById('fileName').textContent = file.name;
-    document.getElementById('updateStatus').textContent = "Se procesează...";
-
     const reader = new FileReader();
+
     reader.onload = function(e) {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
             
-            // Procesăm Excel-ul și creăm noul obiect de date
-            const newMenuData = processExcelData(workbook);
-            
-            if(newMenuData) {
-                generatedData = newMenuData; // Salvăm temporar
-                document.getElementById('updateStatus').innerHTML = "<span style='color:green'>Fișier valid! Structura a fost recunoscută.</span>";
-                document.getElementById('saveInstruction').style.display = "block";
+            // Procesare
+            const newData = processWorkbook(workbook);
+            if(newData) {
+                generatedData = newData;
+                document.getElementById('statusMsg').innerHTML = "<span style='color:green'>Fișier valid!</span>";
+                document.getElementById('saveSection').style.display = 'block';
                 
-                // Opțional: Actualizăm vizualizarea curentă imediat pentru preview
-                window.menuData = newMenuData; 
+                // Preview instant
+                window.menuData = newData;
                 renderMenu();
             }
-        } catch (err) {
+        } catch(err) {
             console.error(err);
-            document.getElementById('updateStatus').innerHTML = "<span style='color:red'>Eroare la citire. Asigurați-vă că folosiți formatul corect (S1, S2...).</span>";
+            alert("Eroare la citirea fișierului. Verifică formatul.");
         }
     };
     reader.readAsArrayBuffer(file);
-}
+});
 
-// 3. Procesare date din Excel (Logica "grea")
-function processExcelData(workbook) {
+function processWorkbook(workbook) {
     const newData = {};
-    const sheetNames = workbook.SheetNames; // Ar trebui să fie S1, S2, S3, S4
+    const sheets = workbook.SheetNames;
 
-    sheetNames.forEach(sheetName => {
-        if (!sheetName.startsWith("S")) return; // Ignorăm alte sheet-uri
-
-        const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
+    sheets.forEach(sheet => {
+        if(!sheet.startsWith('S')) return; // Doar sheet-uri S1, S2 etc.
         
-        // Structura aproximativă:
-        // Rândurile 0-X: Română
-        // Rândurile X-Y: Engleză
-        // Căutăm header-ul "Luni" pentru RO și "Monday" pentru EN
+        const ws = workbook.Sheets[sheet];
+        const json = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+
+        // Căutăm header-ul pentru RO ("Luni") și EN ("Monday")
+        let roIdx = -1, enIdx = -1;
         
-        let roStartIndex = -1;
-        let enStartIndex = -1;
+        json.forEach((row, idx) => {
+            const rowStr = JSON.stringify(row).toLowerCase();
+            if(rowStr.includes('luni')) roIdx = idx;
+            if(rowStr.includes('monday')) enIdx = idx;
+        });
 
-        for(let i=0; i<json.length; i++) {
-            const rowStr = JSON.stringify(json[i]).toLowerCase();
-            if(rowStr.includes("luni")) roStartIndex = i;
-            if(rowStr.includes("monday")) enStartIndex = i;
+        if(roIdx > -1 && enIdx > -1) {
+            newData[sheet] = {
+                ro: extractData(json, roIdx),
+                en: extractData(json, enIdx)
+            };
         }
-
-        if(roStartIndex === -1 || enStartIndex === -1) {
-            console.warn(`Nu am găsit structura completă în ${sheetName}`);
-            return;
-        }
-
-        // Extragem datele
-        newData[sheetName] = {
-            "ro": extractTableBlock(json, roStartIndex),
-            "en": extractTableBlock(json, enStartIndex)
-        };
     });
 
     return Object.keys(newData).length > 0 ? newData : null;
 }
 
-function extractTableBlock(json, headerIndex) {
-    // Luăm zilele din header (col 1-5 presupunem)
-    const headerRow = json[headerIndex];
-    const days = headerRow.slice(1, 6).filter(d => d && d.length > 0); 
+function extractData(json, startIdx) {
+    const header = json[startIdx];
+    // Zilele sunt de la col 1 la 5
+    const days = header.slice(1, 6).filter(d => d);
     
-    // Luăm rândurile de sub header până dăm de gol sau alt header
     const rows = [];
-    let i = headerIndex + 1;
-    
-    // Luăm fix 6 rânduri (Fel 1, Veg, Fel 2, Veg, Salata, Gustare) sau cât găsim
+    let i = startIdx + 1;
+    // Luăm maxim 6 rânduri sau până la gol
     while(i < json.length && rows.length < 6) {
-        const rowData = json[i];
-        if(rowData && rowData[0]) { // Dacă prima coloană (Tipul) are text
-            const type = rowData[0];
-            const items = rowData.slice(1, 6); // Următoarele 5 coloane
-            rows.push({ type, items });
+        const row = json[i];
+        if(row && row[0]) {
+            rows.push({
+                type: row[0],
+                items: row.slice(1, 6)
+            });
         }
         i++;
     }
-
     return { days, rows };
 }
 
-// 4. Funcția de Export (Salvare)
 function downloadNewData() {
     if(!generatedData) return;
-
-    const fileContent = "const menuData = " + JSON.stringify(generatedData, null, 2) + ";";
-    const blob = new Blob([fileContent], { type: "text/javascript" });
+    const content = "const menuData = " + JSON.stringify(generatedData, null, 2) + ";";
+    const blob = new Blob([content], {type: "text/javascript"});
     const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = "data.js";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    
-    alert("Fișierul data.js a fost descărcat!\n\nPASUL URMĂTOR: Intră pe GitHub și înlocuiește vechiul fișier data.js cu acesta nou.");
+    alert("Fișier descărcat! Înlocuiește 'data.js' pe GitHub.");
 }
 
-// Inițializare la pornire
+// Init
 document.addEventListener('DOMContentLoaded', renderMenu);
