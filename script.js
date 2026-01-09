@@ -2,13 +2,51 @@ let currentWeek = 'S1';
 let currentLang = 'ro';
 let generatedData = null;
 
-// RENDER MENIU
+// --- FUNCȚII PENTRU DATE CALENDARISTICE ---
+
+function getMonday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? -6 : 1); // Ajustare pentru Luni
+    return new Date(d.setDate(diff));
+}
+
+function formatDate(date) {
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}.${month}`;
+}
+
+function generateDateLabels() {
+    let today = new Date();
+    let startOfWeek = getMonday(today);
+
+    // Generăm etichete pentru 4 săptămâni începând cu cea curentă
+    for (let i = 0; i < 4; i++) {
+        let currentStart = new Date(startOfWeek);
+        currentStart.setDate(startOfWeek.getDate() + (i * 7)); // Adăugăm săptămâni
+        
+        let currentEnd = new Date(currentStart);
+        currentEnd.setDate(currentStart.getDate() + 4); // Vineri (Luni + 4 zile)
+
+        let label = `${formatDate(currentStart)} - ${formatDate(currentEnd)}`;
+        
+        // Actualizăm textul butoanelor
+        let btn = document.getElementById(`btnS${i+1}`);
+        if(btn) {
+            btn.textContent = label;
+        }
+    }
+}
+
+// --- LOGICA DE AFIȘARE MENIU ---
+
 function renderMenu() {
     const data = menuData[currentWeek][currentLang];
     const headers = document.getElementById('tableHeaders');
     const body = document.getElementById('tableBody');
 
-    // Header
+    // 1. Header Tabel
     headers.innerHTML = `<th>${currentLang === 'ro' ? 'Categorie' : 'Course'}</th>`;
     data.days.forEach(day => {
         const th = document.createElement('th');
@@ -16,19 +54,19 @@ function renderMenu() {
         headers.appendChild(th);
     });
 
-    // Body
+    // 2. Body Tabel
     body.innerHTML = '';
     data.rows.forEach(row => {
         const tr = document.createElement('tr');
         
-        // Verifică dacă e salată pentru stilizare
+        // Colorăm rândul de salată
         if(row.type.toLowerCase().includes('salat') || row.type.toLowerCase().includes('salad')) {
             tr.classList.add('row-salata');
         }
 
         // Prima celulă (Categorie)
         const tdType = document.createElement('td');
-        tdType.textContent = row.type;
+        tdType.innerHTML = `<strong>${row.type}</strong>`;
         tr.appendChild(tdType);
 
         // Celulele de mâncare
@@ -41,7 +79,7 @@ function renderMenu() {
         body.appendChild(tr);
     });
 
-    // Actualizare Tab-uri Active
+    // 3. Update Butoane Active
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`btn${currentWeek}`);
     if(activeBtn) activeBtn.classList.add('active');
@@ -57,7 +95,7 @@ function toggleLang() {
     renderMenu();
 }
 
-// --- ADMIN & EXCEL LOGIC ---
+// --- ADMIN & EXCEL LOGIC (Rămâne neschimbat) ---
 
 function openAdminPanel() {
     const pwd = prompt("Parola Admin:");
@@ -84,20 +122,17 @@ document.getElementById('excelInput').addEventListener('change', function(e) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
             
-            // Procesare
             const newData = processWorkbook(workbook);
             if(newData) {
                 generatedData = newData;
                 document.getElementById('statusMsg').innerHTML = "<span style='color:green'>Fișier valid!</span>";
                 document.getElementById('saveSection').style.display = 'block';
-                
-                // Preview instant
                 window.menuData = newData;
                 renderMenu();
             }
         } catch(err) {
             console.error(err);
-            alert("Eroare la citirea fișierului. Verifică formatul.");
+            alert("Eroare la citirea fișierului.");
         }
     };
     reader.readAsArrayBuffer(file);
@@ -106,22 +141,16 @@ document.getElementById('excelInput').addEventListener('change', function(e) {
 function processWorkbook(workbook) {
     const newData = {};
     const sheets = workbook.SheetNames;
-
     sheets.forEach(sheet => {
-        if(!sheet.startsWith('S')) return; // Doar sheet-uri S1, S2 etc.
-        
+        if(!sheet.startsWith('S')) return;
         const ws = workbook.Sheets[sheet];
         const json = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
-
-        // Căutăm header-ul pentru RO ("Luni") și EN ("Monday")
         let roIdx = -1, enIdx = -1;
-        
         json.forEach((row, idx) => {
             const rowStr = JSON.stringify(row).toLowerCase();
             if(rowStr.includes('luni')) roIdx = idx;
             if(rowStr.includes('monday')) enIdx = idx;
         });
-
         if(roIdx > -1 && enIdx > -1) {
             newData[sheet] = {
                 ro: extractData(json, roIdx),
@@ -129,25 +158,18 @@ function processWorkbook(workbook) {
             };
         }
     });
-
     return Object.keys(newData).length > 0 ? newData : null;
 }
 
 function extractData(json, startIdx) {
     const header = json[startIdx];
-    // Zilele sunt de la col 1 la 5
     const days = header.slice(1, 6).filter(d => d);
-    
     const rows = [];
     let i = startIdx + 1;
-    // Luăm maxim 6 rânduri sau până la gol
     while(i < json.length && rows.length < 6) {
         const row = json[i];
         if(row && row[0]) {
-            rows.push({
-                type: row[0],
-                items: row.slice(1, 6)
-            });
+            rows.push({ type: row[0], items: row.slice(1, 6) });
         }
         i++;
     }
@@ -165,8 +187,12 @@ function downloadNewData() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    alert("Fișier descărcat! Înlocuiește 'data.js' pe GitHub.");
 }
 
+// --- INIT ---
+document.addEventListener('DOMContentLoaded', () => {
+    generateDateLabels(); // Generăm datele pe butoane
+    renderMenu();         // Afișăm tabelul
+});
 // Init
 document.addEventListener('DOMContentLoaded', renderMenu);
