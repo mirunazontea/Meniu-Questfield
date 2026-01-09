@@ -1,33 +1,19 @@
-/**
- * QUESTFIELD MENU SCRIPT
- * Functionalitate: Date din Google Sheets + Mapare fixă pentru categoriile EN
- */
-
 // --- 1. CONFIGURARE ---
 const CONFIG = {
+    // ID-ul Spreadsheet-ului tău
     SHEET_ID: '1RpPfd-5vti-R4TBKCusr1gok-O7eTSdC42be_YlwSkA',
-    API_KEY: 'PUNE_AICI_CHEIA_TA_API_GOOGLE', // <--- PUNE CHEIA TA AICI
-    RANGE: 'Sheet1!A:L' 
+    
+    // !!! ATENȚIE: PUNE AICI API KEY-UL TĂU !!!
+    API_KEY: 'PUNE_AICI_CHEIA_TA_API_GOOGLE', 
+    
+    // Intervalul: Luăm coloanele de la A la L (A-F = RO, G-L = EN)
+    RANGE: 'Sheet1!A:L'
 };
 
-// --- 2. MAPARE CATEGORII (fixează denumirile în engleză) ---
-const CATEGORY_MAPPING = {
-    // Stânga: Exact ce scrie în coloana A (RO) -> Dreapta: Ce vrei să apară în EN
-    "S1 Felul 1": "Main Course",
-    "Felul 1": "Main Course", // Am pus si varianta fara S1 just in case
-    "S1 Felul 2": "Second Course",
-    "Felul 2": "Second Course",
-    "Vegetarian": "Vegetarian",
-    "Salată": "Salad",
-    "Gustare": "Snack",
-    "Desert": "Dessert",
-    "Supa": "Soup",
-    "Ciorbă": "Soup"
-};
-
-// --- 3. TEXTE UI ---
+// --- 2. TEXTE UI (Interfață butoane/titluri) ---
 const TRANSLATIONS = {
     ro: {
+        title: "Meniu Săptămânal",
         loading: "Se încarcă meniul...",
         error: "Nu s-au putut încărca datele.",
         prevWeek: "Săpt. Anterioară",
@@ -38,6 +24,7 @@ const TRANSLATIONS = {
         headers: ['Categorie', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri']
     },
     en: {
+        title: "Weekly Menu",
         loading: "Loading menu...",
         error: "Could not load menu data.",
         prevWeek: "Previous Week",
@@ -49,13 +36,14 @@ const TRANSLATIONS = {
     }
 };
 
-// --- 4. STATE ---
+// --- 3. STATE ---
 let currentWeekOffset = 0;
 let currentLanguage = 'ro'; 
 let cachedMenuData = null; 
 
-// --- 5. ELEMENTE DOM ---
+// --- 4. ELEMENTE DOM ---
 const elements = {
+    title: document.querySelector('h1'),
     prevWeek: document.getElementById('prevWeek'),
     nextWeek: document.getElementById('nextWeek'),
     goToCurrentWeek: document.getElementById('goToCurrentWeek'),
@@ -68,18 +56,22 @@ const elements = {
     errorText: document.querySelector('#error p')
 };
 
-// --- 6. LOGICĂ LIMBĂ & UI ---
+// --- 5. LOGICĂ SCHIMBARE LIMBĂ ---
 function changeLanguage(lang) {
     if (currentLanguage === lang) return;
     currentLanguage = lang;
     
+    // Actualizare butoane active
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.getElementById(`btn-${lang}`);
-    if(activeBtn) activeBtn.classList.add('active');
+    document.getElementById(`btn-${lang}`).classList.add('active');
 
+    // Actualizare texte statice
     updateStaticTexts();
+    
+    // Actualizare date calendaristice
     updateWeekDisplay();
     
+    // Randare tabel (cu datele deja descărcate sau descărcare nouă)
     if (cachedMenuData) {
         renderMenuTable(cachedMenuData);
     } else {
@@ -89,6 +81,11 @@ function changeLanguage(lang) {
 
 function updateStaticTexts() {
     const t = TRANSLATIONS[currentLanguage];
+    
+    // Titlu principal
+    if(elements.title) elements.title.textContent = t.title;
+
+    // Texte butoane navigare
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         const map = {
@@ -99,13 +96,14 @@ function updateStaticTexts() {
         if (map[key] && t[map[key]]) el.textContent = t[map[key]];
     });
 
+    // Header Tabel (Zilele săptămânii)
     const ths = document.querySelectorAll('.menu-table thead th');
     t.headers.forEach((text, index) => {
         if (ths[index]) ths[index].textContent = text;
     });
 }
 
-// --- 7. DATE & TIMP ---
+// --- 6. LOGICĂ DATE CALENDARISTICE ---
 function getMondayOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -145,37 +143,24 @@ function updateWeekDisplay() {
     }
 }
 
-function showLoading() {
+// --- 7. ÎNCĂRCARE DATE DIN GOOGLE SHEETS ---
+async function loadMenuData() {
     elements.loading.style.display = 'block';
     elements.error.style.display = 'none';
     elements.menuTable.style.display = 'none';
-}
 
-function showError() {
-    elements.loading.style.display = 'none';
-    elements.error.style.display = 'block';
-    elements.menuTable.style.display = 'none';
-}
-
-function showMenu() {
-    elements.loading.style.display = 'none';
-    elements.error.style.display = 'none';
-    elements.menuTable.style.display = 'block';
-}
-
-// --- 8. ÎNCĂRCARE DATE ---
-async function loadMenuData() {
-    showLoading();
-
+    // Verificare sumară cheie API
     if (CONFIG.API_KEY.includes('PUNE_AICI')) {
-        console.error("API KEY LIPSEȘTE");
-        elements.errorText.textContent = "Lipsește API Key din script.js";
-        showError();
+        elements.errorText.textContent = "Lipsește API Key din script.js!";
+        elements.loading.style.display = 'none';
+        elements.error.style.display = 'block';
         return;
     }
 
     try {
+        // Cerem datele din range-ul A:L
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.RANGE}?key=${CONFIG.API_KEY}`;
+        
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
@@ -187,90 +172,98 @@ async function loadMenuData() {
 
         if (rows && rows.length > 0) {
             rows.forEach(row => {
-                if (row.length > 0) {
-                    // RO: Primele 6 coloane
-                    const roRow = row.slice(0, 6);
-                    
-                    // EN: Următoarele 6 coloane
-                    let enRow = row.slice(6, 12);
+                // IMPORTANT: Aici preluăm datele exact cum sunt, fără modificări.
+                
+                // --- ROMÂNĂ (Coloanele 0-5 / A-F) ---
+                // Luăm primele 6 celule. Dacă rândul e mai scurt, completăm cu string gol.
+                let roRow = [];
+                for (let i = 0; i < 6; i++) {
+                    roRow.push(row[i] || ""); // Dacă celula e undefined, punem ""
+                }
 
-                    if (roRow[0]) {
-                        roData.push(roRow);
+                // --- ENGLEZĂ (Coloanele 6-11 / G-L) ---
+                // Luăm următoarele 6 celule.
+                let enRow = [];
+                for (let i = 6; i < 12; i++) {
+                    enRow.push(row[i] || ""); // Luăm fix ce e în sheet. Dacă e gol, apare gol.
+                }
 
-                        // LOGICA DE FORȚARE A NUMELUI CATEGORIEI
-                        // Verificăm dacă avem o traducere fixă pentru categoria din RO
-                        const roCategoryName = roRow[0].trim(); // ex: "S1 Felul 1"
-                        
-                        if (CATEGORY_MAPPING[roCategoryName]) {
-                            // Dacă există în mapping, suprascriem prima celulă din EN
-                            if(enRow.length === 0) enRow = ["", "", "", "", "", ""]; // Inițializăm dacă e gol
-                            enRow[0] = CATEGORY_MAPPING[roCategoryName]; 
-                        } else if (!enRow[0]) {
-                            // Fallback: Dacă nu e în mapping și nici în Excel, copiem din RO
-                            if(enRow.length === 0) enRow = ["", "", "", "", "", ""];
-                            enRow[0] = roRow[0];
-                        }
-                        
-                        enData.push(enRow);
-                    }
+                // Adăugăm în liste doar dacă există ceva scris la Categorie (prima coloană din set)
+                // Verificăm roRow[0] pentru că de obicei categoria e scrisă cel puțin la română
+                if (roRow[0] || enRow[0]) {
+                    roData.push(roRow);
+                    enData.push(enRow);
                 }
             });
         }
 
+        // Salvăm datele
         cachedMenuData = { ro: roData, en: enData };
+        
         renderMenuTable(cachedMenuData);
-        showMenu();
+        elements.loading.style.display = 'none';
+        elements.menuTable.style.display = 'block';
         
     } catch (err) {
-        console.error('Error loading menu data:', err);
+        console.error('Error:', err);
         elements.errorText.textContent = TRANSLATIONS[currentLanguage].error;
-        showError();
+        elements.loading.style.display = 'none';
+        elements.error.style.display = 'block';
     }
 }
 
+// --- 8. RANDARE TABEL ---
 function renderMenuTable(data) {
     elements.menuTableBody.innerHTML = '';
+    
+    // Alegem setul de date pe baza limbii curente
     const activeData = (currentLanguage === 'ro') ? data.ro : data.en;
     
     if (!activeData || activeData.length === 0) {
-        elements.menuTableBody.innerHTML = '<tr><td colspan="6">No data available</td></tr>';
+        elements.menuTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nu există date / No data</td></tr>';
         return;
     }
 
     activeData.forEach(row => {
         const tr = document.createElement('tr');
         
-        // Categorie
+        // Prima celulă e Categoria (TH)
         const th = document.createElement('th');
-        th.textContent = row[0] || "";
-        th.className = 'row-header';
+        th.textContent = row[0]; // Exact textul din sheet
         tr.appendChild(th);
 
-        // Zile
+        // Următoarele 5 sunt zilele (TD)
         for (let i = 1; i < 6; i++) {
             const td = document.createElement('td');
-            td.textContent = row[i] || "-";
+            td.textContent = row[i]; // Exact textul din sheet
+            
+            // Etichetă pentru mobile (data-label)
             if(TRANSLATIONS[currentLanguage].headers[i]) {
                 td.setAttribute('data-label', TRANSLATIONS[currentLanguage].headers[i]);
             }
             tr.appendChild(td);
         }
+        
         elements.menuTableBody.appendChild(tr);
     });
 }
 
-// --- 9. INITIALIZARE ---
-if(elements.prevWeek) elements.prevWeek.addEventListener('click', () => { currentWeekOffset--; updateWeekDisplay(); loadMenuData(); });
-if(elements.nextWeek) elements.nextWeek.addEventListener('click', () => { currentWeekOffset++; updateWeekDisplay(); loadMenuData(); });
-if(elements.goToCurrentWeek) elements.goToCurrentWeek.addEventListener('click', () => { currentWeekOffset = 0; updateWeekDisplay(); loadMenuData(); });
+// --- 9. EVENT LISTENERS ---
+elements.prevWeek.addEventListener('click', () => { currentWeekOffset--; changeLanguage(currentLanguage); });
+elements.nextWeek.addEventListener('click', () => { currentWeekOffset++; changeLanguage(currentLanguage); });
+elements.goToCurrentWeek.addEventListener('click', () => { currentWeekOffset = 0; changeLanguage(currentLanguage); });
 
+// Facem funcția globală pentru butoanele din HTML
 window.changeLanguage = changeLanguage;
 
+// Pornire
 document.addEventListener('DOMContentLoaded', () => {
     updateStaticTexts();
     updateWeekDisplay();
     loadMenuData();
 });
+});
+
 
 
 
