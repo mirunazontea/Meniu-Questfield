@@ -228,4 +228,3 @@ input[type="file"] { display: none; }
     .tab-btn.active { border-bottom: 1px solid var(--q-gold); }
     th, td { font-size: 12px; padding: 10px; }
 }
-}
