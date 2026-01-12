@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        /* --- PALETA DE CULORI --- */
+        /* --- CULORI (Crem / Albastru / Auriu) --- */
         :root {
             --q-blue: #1D4363;       /* Albastru Marin închis */
             --q-gold: #FFD700;       /* Galben intens */
@@ -61,11 +61,12 @@
             color: var(--q-gold);            
             border: none; padding: 10px 15px;
             font-family: 'Montserrat', sans-serif; 
-            font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
+            font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;
             min-width: 180px; text-align: center; border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 65px; /* Inaltime fixa ca sa arate bine */
+            min-height: 70px; /* Înălțime fixă pentru consistență */
+            position: relative;
         }
         
         .week-btn:hover { 
@@ -74,22 +75,29 @@
             filter: brightness(1.1);
         }
 
-        /* Stil pentru butonul SELECTAT (cel pe care am dat click) */
+        /* Stil pentru butonul SELECTAT (Click) */
         .week-btn.active {
             border: 2px solid var(--q-gold);
             background-color: #163a57; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
         }
 
-        /* Textul "SAPTAMANA CURENTA" de pe buton */
+        /* --- STIL PENTRU ETICHETA "SAPTAMANA CURENTA" --- */
         .current-badge {
-            color: #1D4363; 
             background-color: var(--q-gold);
-            font-size: 0.7em; text-transform: uppercase; 
-            margin-top: 6px; font-weight: 800; letter-spacing: 0.5px;
-            padding: 3px 8px; border-radius: 4px;
+            color: var(--q-blue); 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            margin-top: 6px; 
+            font-weight: 800; 
+            letter-spacing: 0.5px;
+            padding: 4px 8px; 
+            border-radius: 4px;
             display: inline-block;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-in-out;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* SCHIMBARE LIMBA */
         .lang-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
@@ -205,6 +213,7 @@
     <script>
         // ===============================================================
         // DATA DE START A MENIULUI (LUNI) - FORMAT: AAAA-LL-ZZ
+        // ATENTIE: Modifica link-urile de mai jos cu cele reale!
         // ===============================================================
         const MENU_START_DATE = "2026-01-05"; 
         // ===============================================================
@@ -222,7 +231,7 @@
                 loading: "Se încarcă meniul...",
                 langBtn: "Switch to English",
                 week: "Săptămâna",
-                currWeek: "Săptămâna Curentă",
+                currWeek: "SĂPTĂMÂNA CURENTĂ", // Textul pentru badge
                 err: "Nu s-au găsit datele pentru această săptămână."
             },
             en: {
@@ -230,7 +239,7 @@
                 loading: "Loading menu...",
                 langBtn: "Schimbă în Română",
                 week: "Week",
-                currWeek: "Current Week",
+                currWeek: "CURRENT WEEK",
                 err: "No data found for this week."
             }
         };
@@ -249,8 +258,8 @@
             // 1. Calculam ce saptamana este curenta
             let startDate = new Date(MENU_START_DATE);
             let today = new Date();
-            today.setHours(0,0,0,0); // Resetam ora pt comparatie
-            
+            today.setHours(0,0,0,0); // Ignoram ora exacta, comparam doar data
+
             let activeIndex = 0; // Default Week 1
 
             for(let i=0; i<4; i++) {
@@ -260,10 +269,11 @@
                 let e = new Date(s); 
                 e.setDate(s.getDate() + 4); // End Vineri
 
+                // Consideram saptamana curenta pana duminica seara
                 let weekEndSunday = new Date(s);
-                weekEndSunday.setDate(s.getDate() + 6); // Duminica (pt detectie)
+                weekEndSunday.setDate(s.getDate() + 6); 
 
-                // Verificam daca AZI este in aceasta saptamana
+                // Verificam daca AZI este in intervalul Luni - Duminica
                 let isCurrent = (today >= s && today <= weekEndSunday);
                 if(isCurrent) {
                     activeIndex = i;
@@ -274,11 +284,11 @@
                 if(btn) {
                     btn.dataset.dateText = `${formatDate(s)} - ${formatDate(e)}`;
                     btn.dataset.weekNum = i + 1;
-                    btn.dataset.isCurrent = isCurrent; 
+                    btn.dataset.isCurrent = isCurrent ? "true" : "false"; 
                 }
             }
 
-            // 2. Setam textele si deschidem saptamana curenta
+            // 2. Setam textele si deschidem automat saptamana curenta
             updateStaticTexts();
             changeWeek(activeIndex);
         }
@@ -297,10 +307,10 @@
 
         function updateButtonText(btn) {
             const t = TEXTS[currentLang];
-            let html = `<div style="font-weight:700; font-size:1.1em; color:var(--q-gold)">${t.week} ${btn.dataset.weekNum}</div>`;
-            html += `<div style="font-size:0.8em; opacity:0.9; color:white; font-weight:400; margin-top:2px">${btn.dataset.dateText}</div>`;
+            let html = `<div style="font-weight:700; font-size:1.1rem; color:var(--q-gold)">${t.week} ${btn.dataset.weekNum}</div>`;
+            html += `<div style="font-size:0.85rem; opacity:0.9; color:white; font-weight:400; margin-top:2px">${btn.dataset.dateText}</div>`;
             
-            // Daca este saptamana curenta, punem badge-ul
+            // Daca este saptamana curenta, adaugam badge-ul vizibil
             if(btn.dataset.isCurrent === "true") {
                 html += `<div class="current-badge">${t.currWeek}</div>`;
             }
@@ -326,7 +336,9 @@
         }
 
         function loadData(url) {
-            if(url.includes("ID-UL-TĂU")) return;
+            // Verificare simpla sa nu incerce sa incarce link-uri invalide
+            if(url.includes("ID-UL-TĂU") || url.length < 10) return;
+
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
             const bust = url + "&t=" + new Date().getTime();
@@ -399,15 +411,21 @@
             const tbody = document.getElementById('tableBody');
             const thead = document.getElementById('tableHeader');
             tbody.innerHTML = ''; thead.innerHTML = '';
-            if(!data) return;
+            
+            if(!data) {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">${TEXTS[currentLang].err}</td></tr>`;
+                return;
+            }
+
             const activeData = currentLang === 'ro' ? (data.ro || data.en) : (data.en || data.ro);
             if(!activeData) {
-                tbody.innerHTML = `<tr><td colspan="6">${TEXTS[currentLang].err}</td></tr>`; return;
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">${TEXTS[currentLang].err}</td></tr>`; return;
             }
 
             // Detectie ziua curenta pentru highlight in tabel
             let today = new Date();
-            let dayIndex = today.getDay() - 1; 
+            let dayIndex = today.getDay() - 1; // 0=Luni...
+            // Daca e weekend, nu selectam nimic in tabel
             if(today.getDay() === 0 || today.getDay() === 6) dayIndex = -1;
 
             let thRow = `<th></th>`;
