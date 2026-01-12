@@ -5,93 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meniu Questfield</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        /* --- DESIGN --- */
+        /* --- DESIGN UPDATED TO MATCH IMAGE --- */
         :root {
-            --q-blue: #0E2636;
-            --q-gold: #CE9F49;
-            --q-green: #E2EFDA;
+            /* Colors extracted from the image */
+            --q-blue: #254E70;       /* The deep blue from buttons/text */
+            --q-blue-light: #E6F2F8; /* The light blue card background */
+            --q-gold: #FFC107;       /* The yellow highlight */
+            --q-gold-hover: #e0a800;
             --q-white: #FFFFFF;
-            --q-bg: #F9F9F9;
-            --q-text: #333333;
-            --border: #E0E0E0;
+            --q-bg: #F9F9F9;         /* Off-white page background */
+            --q-text: #2D3748;       /* Dark gray text */
+            --q-border-color: #CBD5E0;
         }
+
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Roboto', 'Montserrat', sans-serif;
             background-color: var(--q-bg);
-            margin: 0; padding: 0; color: var(--q-text);
+            margin: 0; padding: 20px; color: var(--q-text);
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
-        .container {
-            width: 95%; max-width: 1200px;
-            background: var(--q-white);
-            margin: 40px auto; padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            border-radius: 8px;
+
+        /* Top Header Area (Logo & Flags) */
+        .site-header {
+            width: 100%; max-width: 1000px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
         }
-        header { text-align: center; margin-bottom: 40px; }
-        header h1 {
-            color: var(--q-blue); font-size: 2.2rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 2px;
-            margin: 0; padding-bottom: 15px; position: relative;
+        .logo-placeholder {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700; color: #b8860b; /* Goldish color for text */
+            text-transform: uppercase; letter-spacing: 1px;
+            font-size: 1.1rem;
         }
-        header h1::after {
-            content: ''; display: block; width: 80px; height: 4px;
-            background-color: var(--q-gold); margin: 15px auto 0; border-radius: 2px;
+        .logo-icon {
+            height: 40px; width: auto; /* Placeholder for shield */
         }
+        .flags {
+            font-size: 1.5rem;
+        }
+
+        /* Main Title */
+        h1.page-title {
+            color: #333;
+            font-size: 2rem; font-weight: 700;
+            text-align: center;
+            margin: 0 0 30px 0;
+        }
+
+        /* Navigation Buttons */
         .week-nav {
             display: flex; justify-content: center; gap: 15px;
-            margin-bottom: 30px; flex-wrap: wrap;
+            margin-bottom: 20px; flex-wrap: wrap;
         }
+
         .week-btn {
-            background-color: var(--q-white); border: 1px solid var(--border);
-            color: var(--q-text); padding: 14px 20px;
-            font-family: 'Montserrat', sans-serif; font-weight: 600;
-            font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease;
-            min-width: 180px; text-align: center; border-radius: 4px;
+            background-color: var(--q-blue); /* Dark Blue Background */
+            color: var(--q-gold);            /* Gold Text */
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Roboto', sans-serif; font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s ease;
+            min-width: 140px; text-align: center;
+            border-radius: 6px;
         }
-        .week-btn:hover { border-color: var(--q-gold); transform: translateY(-2px); }
+        .week-btn:hover { 
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        /* Active State = The "Current Week" Yellow Button style */
         .week-btn.active {
-            background-color: var(--q-blue); color: var(--q-white);
-            border-color: var(--q-blue); box-shadow: 0 5px 15px rgba(14, 38, 54, 0.2);
+            background-color: var(--q-gold);
+            color: var(--q-blue);
+            font-weight: 800;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: scale(1.05);
         }
-        .lang-wrapper { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+
+        /* Language Toggle */
+        .lang-wrapper { 
+            display: flex; justify-content: center; margin-bottom: 20px; 
+        }
         .lang-btn {
-            background: transparent; border: 1px solid #ccc;
-            padding: 6px 15px; font-size: 0.75rem; font-weight: 700;
-            color: #666; cursor: pointer; border-radius: 4px;
+            background: transparent; border: 1px solid var(--q-blue);
+            color: var(--q-blue);
+            padding: 5px 15px; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; border-radius: 4px;
         }
+        .lang-btn:hover { background: var(--q-blue); color: var(--q-white); }
+
+        /* --- THE MENU CARD CONTAINER --- */
+        .container {
+            width: 100%; max-width: 1000px;
+            background: var(--q-blue-light); /* Light blue background from image */
+            margin: 0 auto; padding: 25px;
+            /* The specific thick blue border on the left */
+            border-left: 6px solid var(--q-blue); 
+            border-radius: 0 10px 10px 0; /* Rounded on right side only */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
         .table-wrap {
-            overflow-x: auto; border-top: 3px solid var(--q-blue);
-            border-radius: 4px 4px 0 0; min-height: 300px; position: relative;
+            overflow-x: auto;
+            min-height: 200px;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+
+        /* Table Styling to look like Grid Cards */
+        table { 
+            width: 100%; 
+            border-collapse: separate; /* Allows spacing between cells */
+            border-spacing: 10px;      /* Gap between "Cards" */
+            min-width: 600px; 
+        }
+
         th {
-            background-color: #F8F8F8; color: var(--q-blue);
-            padding: 18px; text-transform: uppercase;
-            font-size: 0.85rem; font-weight: 700;
-            border: 1px solid var(--border); text-align: center;
+            padding: 10px;
+            text-align: left;
+            font-size: 1.1rem; color: #333;
+            font-weight: 700;
+            /* Making the header look like "Monday, Jan 12" style */
         }
+
         td {
-            padding: 15px; border: 1px solid var(--border);
-            font-size: 0.9rem; vertical-align: middle;
-            text-align: center; line-height: 1.5; color: #444;
+            background-color: var(--q-white);
+            padding: 20px;
+            border-radius: 8px; /* Rounded card corners */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            vertical-align: top;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #4A5568;
+            border: 1px solid transparent;
+            text-align: center;
         }
+
+        /* The First Column (Categories: Main Course, etc) */
         td:first-child {
-            background-color: var(--q-blue); color: var(--q-white);
-            font-weight: 700; text-align: left; width: 170px;
-            border-right: 1px solid #0b1f2d;
+            background-color: transparent;
+            box-shadow: none;
+            text-align: right;
+            font-weight: 700;
+            color: var(--q-blue);
+            width: 120px;
+            border: none;
+            vertical-align: middle;
+            font-size: 1rem;
         }
-        tr.row-salad td:not(:first-child) { background-color: var(--q-green); }
+
+        /* Highlight for Salad/Veg rows if needed, or keep white */
+        tr.row-salad td:not(:first-child) { 
+            background-color: #FAFFF5; /* Very subtle green tint for salad */
+            border: 1px solid #E2EFDA;
+        }
         
         .loader {
             display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); z-index: 10;
+            background: rgba(255,255,255,0.8); z-index: 10;
             justify-content: center; align-items: center; flex-direction: column; color: var(--q-blue);
+            border-radius: 0 10px 10px 0;
         }
         .spinner {
             border: 4px solid #f3f3f3; border-top: 4px solid var(--q-gold);
@@ -99,34 +177,55 @@
             animation: spin 1s linear infinite; margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        footer { margin-top: auto; padding: 30px; text-align: center; font-size: 0.8rem; color: #AAA; }
+        
+        footer { margin-top: 40px; text-align: center; font-size: 0.8rem; color: #AAA; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header><h1>Meniul Săptămânal</h1></header>
-        <div class="week-nav">
-            <button onclick="changeWeek(0)" id="btnW0" class="week-btn">...</button>
-            <button onclick="changeWeek(1)" id="btnW1" class="week-btn">...</button>
-            <button onclick="changeWeek(2)" id="btnW2" class="week-btn">...</button>
-            <button onclick="changeWeek(3)" id="btnW3" class="week-btn">...</button>
+
+    <div class="site-header">
+        <div class="logo-placeholder">
+            <svg width="40" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" fill="#b8860b"/>
+                <path d="M12 4L18 6.5V11C18 15.5 15.5 19.5 12 20.5V4Z" fill="#254E70"/>
+            </svg>
+            <div>QUESTFIELD<br><span style="font-size:0.7em; color:#254E70">INTERNATIONAL COLLEGE</span></div>
         </div>
-        <div class="lang-wrapper"><button onclick="toggleLang()" id="btnLang" class="lang-btn">RO / EN</button></div>
+        <div class="flags">
+            🇷🇴 🇬🇧
+        </div>
+    </div>
+
+    <h1 class="page-title">Weekly Lunch Menu</h1>
+
+    <div class="week-nav">
+        <button onclick="changeWeek(0)" id="btnW0" class="week-btn">Săptămâna 1</button>
+        <button onclick="changeWeek(1)" id="btnW1" class="week-btn">Săptămâna 2</button>
+        <button onclick="changeWeek(2)" id="btnW2" class="week-btn">Săptămâna 3</button>
+        <button onclick="changeWeek(3)" id="btnW3" class="week-btn">Săptămâna 4</button>
+    </div>
+
+    <div class="lang-wrapper"><button onclick="toggleLang()" id="btnLang" class="lang-btn">RO / EN</button></div>
+
+    <div class="container">
         <div class="table-wrap">
             <div id="loader" class="loader">
-                <div class="spinner"></div><span>Se actualizează meniul...</span>
+                <div class="spinner"></div><span>Updating Menu...</span>
             </div>
             <table id="menuTable">
-                <thead><tr id="tableHeader"></tr></thead>
-                <tbody id="tableBody"></tbody>
+                <thead id="tableHeader">
+                    </thead>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
         </div>
     </div>
-    <footer><div>&copy; 2026 Questfield</div></footer>
+
+    <footer><div>&copy; 2026 Questfield International College</div></footer>
 
     <script>
         // ===============================================================
-        // AICI PUI LINK-URILE TALE O SINGURĂ DATĂ. NU MAI SCHIMBI NIMIC.https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=184508981&single=true&output=csv
+        // AICI PUI LINK-URILE TALE O SINGURĂ DATĂ. NU MAI SCHIMBI NIMIC.
         // ===============================================================
         const LINKS = [
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=0&single=true&output=csv",  // Link Saptamana 1
@@ -250,7 +349,7 @@
             const thead = document.getElementById('tableHeader');
             const tbody = document.getElementById('tableBody');
 
-            thead.innerHTML = `<th>${currentLang==='ro'?'Categorie':'Course'}</th>`;
+            thead.innerHTML = `<th></th>`; // Empty cell for category column
             currentData.days.forEach(d => {
                 let th = document.createElement('th'); th.textContent = d; thead.appendChild(th);
             });
