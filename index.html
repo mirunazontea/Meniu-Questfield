@@ -147,31 +147,39 @@
             border-color: transparent transparent #E53E3E transparent;
         }
 
-        /* --- CONTAINER GENERAL --- */
+        /* --- CONTAINER GENERAL - FIXUL PENTRU POZITIONARE --- */
         .container {
             width: 100%; max-width: 1100px;
             background: var(--q-cream-bg); 
             margin: 0 auto; 
-            position: relative; 
-            min-height: 60vh;   
-            display: flex;
+            
+            /* ACEASTA ESTE CHEIA PENTRU LOADER: */
+            min-height: 50vh;  /* Ocupa macar jumatate de ecran */
+            display: flex;     /* Folosim Flexbox */
             flex-direction: column;
+            justify-content: flex-start; /* Continutul incepe de sus */
+            align-items: stretch; /* Se intinde pe toata latimea */
+            position: relative;
+        }
+        
+        /* Cand se incarca (loaderul e vizibil), centram totul */
+        .container.is-loading {
+            justify-content: center; /* Centram vertical */
+            align-items: center;     /* Centram orizontal */
         }
 
         /* --- LOADER (OMIDA) --- */
+        /* ACUM E SIMPLU, FARA ABSOLUTE/FIXED */
         .loader {
             display: flex; 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%;
-            background: var(--q-cream-bg); 
-            z-index: 50; 
-            justify-content: center; 
-            align-items: center;     
             flex-direction: column; 
+            align-items: center;
+            justify-content: center;
             color: var(--q-blue);
             border-radius: 12px;
+            /* Nu mai avem top, left, position aici. E un element normal. */
         }
+        
         #loaderText {
             margin-top: -20px; font-weight: 700; font-size: 1.2rem;
             color: var(--q-blue); animation: pulse 1.5s infinite ease-in-out;
@@ -301,13 +309,13 @@
             .week-nav { 
                 gap: 15px; 
                 margin-bottom: 40px;
-                /* FIX OVERLAP: Folosim row-gap mare + margin-bottom pe butoane */
+                /* FIX OVERLAP: Spatiu mare intre randuri */
                 row-gap: 45px; 
             }
             .week-btn { 
                 min-width: 40%; flex: 1 1 40%; 
                 padding: 10px; min-height: 60px;
-                /* FIX EXTRA: Fortam spatiu sub buton */
+                /* FIX EXTRA: Spatiu sub buton */
                 margin-bottom: 5px; 
             }
             .current-badge { bottom: -28px; font-size: 0.65rem; }
@@ -348,7 +356,7 @@
         <button onclick="changeWeek(3)" id="btnW3" class="week-btn">Week 4</button>
     </div>
 
-    <div class="container">
+    <div class="container is-loading" id="mainContainer">
         
         <div id="loader" class="loader">
             <lottie-player src="https://api.npoint.io/eaa00a811379b6194348" background="transparent" speed="1" style="width: 250px; height: 250px;" loop autoplay></lottie-player>
@@ -504,8 +512,14 @@
 
         function loadData(url) {
             if(url.includes("ID-UL-TĂU") || url.length < 10) return;
+            
             const loader = document.getElementById('loader');
+            const container = document.getElementById('mainContainer');
+            
+            // Aratam loaderul, centram containerul
             loader.style.display = 'flex';
+            container.classList.add('is-loading');
+            
             const bust = url + "&t=" + new Date().getTime();
 
             Papa.parse(bust, {
@@ -514,11 +528,17 @@
                     const parsed = processExcelData(results.data);
                     cachedData[currentWeekIndex] = parsed;
                     renderData(parsed);
-                    setTimeout(() => { loader.style.display = 'none'; }, 600); 
+                    
+                    setTimeout(() => { 
+                        loader.style.display = 'none'; 
+                        // Scoatem clasa de centrare ca sa lasam tabelul sa se intinda
+                        container.classList.remove('is-loading');
+                    }, 600); 
                 },
                 error: function() {
                     document.getElementById('tableBody').innerHTML = `<tr><td colspan="6">Eroare încărcare date.</td></tr>`;
                     loader.style.display = 'none';
+                    container.classList.remove('is-loading');
                 }
             });
         }
