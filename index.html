@@ -93,7 +93,7 @@
         table { 
             width: 100%; 
             border-collapse: separate; 
-            border-spacing: 8px; /* Spatiu intre carduri */
+            border-spacing: 8px; 
             min-width: 800px; 
         }
 
@@ -103,7 +103,6 @@
             text-transform: capitalize;
         }
 
-        /* CARDURILE DE MANCARE */
         td {
             background-color: var(--q-white); padding: 15px;
             border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);
@@ -112,7 +111,6 @@
             height: 100%;
         }
 
-        /* Coloana Categorie (Prima) */
         td:first-child {
             background-color: transparent; box-shadow: none;
             text-align: right; font-weight: 700; color: var(--q-blue);
@@ -120,15 +118,11 @@
             font-size: 0.95rem; padding-right: 15px;
         }
 
-        /* Stil pentru randuri alternative sau salate */
-        tr:nth-child(even) td:not(:first-child) {
-            background-color: #fdfdfd;
-        }
+        tr:nth-child(even) td:not(:first-child) { background-color: #fdfdfd; }
         tr.row-salad td:not(:first-child) { 
             background-color: #FAFFF5; border: 1px solid #E2EFDA;
         }
         
-        /* LOADER */
         .loader {
             display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.9); z-index: 10;
@@ -185,17 +179,18 @@
 
     <script>
         // ===============================================================
-        // LINK-URILE GOOGLE SHEETS
+        // DATA DE START A MENIULUI (LUNI) - FORMAT: AAAA-LL-ZZ
         // ===============================================================
+        const MENU_START_DATE = "2026-01-05"; 
+        // ===============================================================
+
         const LINKS = [
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=0&single=true&output=csv",
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=1317978849&single=true&output=csv",
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=11715441&single=true&output=csv",
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=184508981&single=true&output=csv"
         ];
-        // ===============================================================
 
-        // TEXTE DE INTERFATA
         const TEXTS = {
             ro: {
                 title: "Meniul Săptămânal",
@@ -217,34 +212,46 @@
         let currentWeekIndex = 0;
         let cachedData = {};
 
-        // Functii Data Calendaristica
-        function getMonday(d) {
-            d = new Date(d);
-            var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-            return new Date(d.setDate(diff));
-        }
         function formatDate(d) {
             let dd = d.getDate().toString().padStart(2,'0');
             let mm = (d.getMonth()+1).toString().padStart(2,'0');
             return `${dd}.${mm}`;
         }
 
-        // Initializare Pagina
         function initPage() {
             updateStaticTexts();
-            // Generare date pe butoane
-            let start = getMonday(new Date());
+            
+            // Calculam datele butoanelor pornind de la data fixa
+            let startDate = new Date(MENU_START_DATE);
+            let today = new Date();
+            let activeIndex = 0; // Default Week 1
+
             for(let i=0; i<4; i++) {
-                let s = new Date(start); s.setDate(start.getDate() + i*7);
-                let e = new Date(s); e.setDate(s.getDate() + 4);
+                let s = new Date(startDate); 
+                s.setDate(startDate.getDate() + (i * 7)); // Start saptamana curenta din loop
+                
+                let e = new Date(s); 
+                e.setDate(s.getDate() + 4); // Vineri
+
+                // Configuram butonul
                 let btn = document.getElementById(`btnW${i}`);
                 if(btn) {
-                    // Stocam datele in dataset ca sa le putem actualiza la schimbarea limbii
                     btn.dataset.dateText = `${formatDate(s)} - ${formatDate(e)}`;
                     btn.dataset.weekNum = i + 1;
                     updateButtonText(btn);
                 }
+
+                // Verificam daca AZI este in aceasta saptamana (inclusiv weekend)
+                let weekEndSunday = new Date(s);
+                weekEndSunday.setDate(s.getDate() + 6);
+                
+                if (today >= s && today <= weekEndSunday) {
+                    activeIndex = i;
+                }
             }
+            
+            // Setam saptamana activa
+            changeWeek(activeIndex);
         }
 
         function updateStaticTexts() {
@@ -253,7 +260,6 @@
             document.getElementById('loaderText').textContent = t.loading;
             document.getElementById('btnLang').textContent = t.langBtn;
             
-            // Update buttons
             for(let i=0; i<4; i++) {
                 let btn = document.getElementById(`btnW${i}`);
                 if(btn) updateButtonText(btn);
@@ -283,7 +289,6 @@
             }
         }
 
-        // --- LOGICA DE PARSARE COMPLEXA ---
         function loadData(url) {
             if(url.includes("ID-UL-TĂU")) return;
             const loader = document.getElementById('loader');
@@ -307,16 +312,14 @@
         }
 
         function processExcelData(rows) {
-            // 1. Gasim coordonatele blocurilor RO si EN
             let roCoords = findBlockCoordinates(rows, "luni");
             let enCoords = findBlockCoordinates(rows, "monday");
 
-            // Daca nu gasim unul dintre ele, incercam fallback
             if(!roCoords && !enCoords) return null;
 
             return {
-                ro: extractDataFromCoords(rows, roCoords, roCoords), // Foloseste categoriile RO pt RO
-                en: extractDataFromCoords(rows, enCoords, roCoords)  // Foloseste categoriile RO pt EN (daca EN nu are)
+                ro: extractDataFromCoords(rows, roCoords, roCoords), 
+                en: extractDataFromCoords(rows, enCoords, roCoords)  
             };
         }
 
@@ -324,7 +327,6 @@
             for(let i=0; i<rows.length; i++) {
                 let rowStr = JSON.stringify(rows[i]).toLowerCase();
                 if(rowStr.includes(keyword)) {
-                    // Am gasit randul, acum gasim coloana
                     for(let k=0; k<rows[i].length; k++) {
                         if(rows[i][k] && rows[i][k].toLowerCase().includes(keyword)) {
                             return { row: i, col: k };
@@ -338,26 +340,21 @@
         function extractDataFromCoords(rows, dataCoords, categoryCoords) {
             if(!dataCoords) return null;
             
-            // Header-ul (Zilele)
             let headerRow = rows[dataCoords.row];
             let days = headerRow.slice(dataCoords.col, dataCoords.col + 5);
 
-            // Randurile de mancare
             let items = [];
             let r = dataCoords.row + 1;
             let safety = 0;
 
             while(r < rows.length && safety < 10) {
                 let rowData = rows[r];
-                
-                // Verificam daca randul are continut in zona datelor
                 let hasFood = false;
                 for(let c=0; c<5; c++) {
                     if(rowData[dataCoords.col + c] && rowData[dataCoords.col + c].trim().length > 1) hasFood = true;
                 }
 
                 if(hasFood) {
-                    // Extragem Categoria (ne uitam la coordonatele categoriei - 1 coloana)
                     let catName = "";
                     if(categoryCoords) {
                         let catCol = categoryCoords.col - 1;
@@ -365,7 +362,6 @@
                             catName = rows[r][catCol];
                         }
                     }
-                    
                     items.push({
                         category: catName,
                         food: rowData.slice(dataCoords.col, dataCoords.col + 5)
@@ -390,27 +386,21 @@
                 return;
             }
 
-            // Render Header
-            let thRow = `<th></th>`; // Spatiu pt categorie
+            let thRow = `<th></th>`; 
             activeData.days.forEach(d => thRow += `<th>${d}</th>`);
             thead.innerHTML = thRow;
 
-            // Render Rows
             activeData.items.forEach(row => {
                 let tr = document.createElement('tr');
-                
-                // Logica vizuala pentru salate/gustari (optional)
                 let catLower = row.category.toLowerCase();
                 if(catLower.includes('salad') || catLower.includes('salat') || catLower.includes('snack') || catLower.includes('gustar')) {
                     tr.classList.add('row-salad');
                 }
 
-                // Celula Categorie
                 let tdCat = document.createElement('td');
                 tdCat.innerHTML = row.category; 
                 tr.appendChild(tdCat);
 
-                // Celule Mancare
                 row.food.forEach(f => {
                     let td = document.createElement('td');
                     td.innerText = f || '-';
