@@ -9,16 +9,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        /* --- PALETA DE CULORI (Inspirată din imagine) --- */
+        /* --- PALETA DE CULORI --- */
         :root {
-            --q-blue: #1D4363;       /* Albastru Marin închis (Butoane) */
-            --q-gold: #FFD700;       /* Galben/Auriu intens (Text butoane) */
-            --q-cream-bg: #FEFCF5;   /* Fundal pagină (Crem) */
-            --q-highlight: #FFF8E1;  /* Fundal pentru ZIUA CURENTĂ (Galben foarte pal) */
-            --q-border-gold: #F0E68C;/* Chenar pentru ziua curentă */
+            --q-blue: #1D4363;       /* Albastru Marin închis */
+            --q-gold: #FFD700;       /* Galben intens */
+            --q-cream-bg: #FEFCF5;   /* Fundal pagină */
+            --q-highlight: #FFF8E1;  /* Fundal ZIUA CURENTĂ */
+            --q-border-gold: #F0E68C;/* Chenar ziua curentă */
             --q-white: #FFFFFF;
-            --q-text: #333333;       /* Gri închis elegant */
-            --q-gray-light: #718096;
+            --q-text: #333333;       
         }
 
         body {
@@ -63,9 +62,10 @@
             border: none; padding: 10px 15px;
             font-family: 'Montserrat', sans-serif; 
             font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease;
-            min-width: 160px; text-align: center; border-radius: 6px;
+            min-width: 180px; text-align: center; border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 65px; /* Inaltime fixa ca sa arate bine */
         }
         
         .week-btn:hover { 
@@ -74,17 +74,21 @@
             filter: brightness(1.1);
         }
 
-        /* Stil pentru butonul selectat activ */
+        /* Stil pentru butonul SELECTAT (cel pe care am dat click) */
         .week-btn.active {
             border: 2px solid var(--q-gold);
-            background-color: #163a57; /* Un pic mai inchis */
+            background-color: #163a57; 
         }
 
-        /* Textul "Saptamana Curenta" de pe buton */
+        /* Textul "SAPTAMANA CURENTA" de pe buton */
         .current-badge {
-            color: #FFFFFF; font-size: 0.75em; text-transform: uppercase; 
-            margin-top: 4px; font-weight: 700; letter-spacing: 0.5px;
-            background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;
+            color: #1D4363; 
+            background-color: var(--q-gold);
+            font-size: 0.7em; text-transform: uppercase; 
+            margin-top: 6px; font-weight: 800; letter-spacing: 0.5px;
+            padding: 3px 8px; border-radius: 4px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* SCHIMBARE LIMBA */
@@ -99,9 +103,8 @@
         /* CONTAINER MENIU */
         .container {
             width: 100%; max-width: 1100px;
-            background: var(--q-cream-bg); /* Match body bg for seamless look or make slightly darker */
-            margin: 0 auto; 
-            position: relative;
+            background: var(--q-cream-bg); 
+            margin: 0 auto; position: relative;
         }
 
         .table-wrap { overflow-x: auto; min-height: 300px; padding-bottom: 20px; }
@@ -109,7 +112,7 @@
         table { 
             width: 100%; 
             border-collapse: separate; 
-            border-spacing: 12px; /* Spatiu intre carduri */
+            border-spacing: 12px; 
             min-width: 800px; 
         }
 
@@ -119,17 +122,14 @@
             text-transform: capitalize;
         }
 
-        /* CARDURILE DE MANCARE */
         td {
             background-color: var(--q-white); padding: 20px;
             border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Umbra fina */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             vertical-align: top; font-size: 0.95rem; line-height: 1.5;
             color: #4A5568; border: 1px solid #EEE; text-align: center;
-            height: 100%;
         }
 
-        /* Coloana Categorie (Prima) */
         td:first-child {
             background-color: transparent; box-shadow: none; border: none;
             text-align: right; font-weight: 700; color: var(--q-blue);
@@ -137,25 +137,18 @@
             font-size: 1rem; padding-right: 20px;
         }
 
-        /* --- HIGHLIGHT PENTRU ZIUA CURENTA --- */
-        /* Clasa aplicata automat de JS pe TH si TD */
+        /* --- HIGHLIGHT PENTRU ZIUA CURENTA (LUNI, MARTI...) --- */
         .is-today {
-            background-color: var(--q-highlight) !important; /* Galben pal */
+            background-color: var(--q-highlight) !important; 
             border: 2px solid var(--q-border-gold) !important;
-            position: relative;
         }
-        /* Adaugam o eticheta mica 'Azi' pe header */
         th.is-today::after {
             content: '●'; color: var(--q-gold); 
             font-size: 0.8em; margin-left: 8px; vertical-align: middle;
         }
 
-        /* Stil pentru salate (Subtil) */
-        tr.row-salad td:not(:first-child) { 
-            border-bottom: 3px solid #E2EFDA;
-        }
+        tr.row-salad td:not(:first-child) { border-bottom: 3px solid #E2EFDA; }
         
-        /* LOADER */
         .loader {
             display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(254, 252, 245, 0.9); z-index: 10;
@@ -229,7 +222,7 @@
                 loading: "Se încarcă meniul...",
                 langBtn: "Switch to English",
                 week: "Săptămâna",
-                currWeek: "Săptămâna Curentă", // Textul pentru highlight saptamana
+                currWeek: "Săptămâna Curentă",
                 err: "Nu s-au găsit datele pentru această săptămână."
             },
             en: {
@@ -253,41 +246,40 @@
         }
 
         function initPage() {
-            updateStaticTexts();
-            
-            // Calculam datele butoanelor pornind de la data fixa
+            // 1. Calculam ce saptamana este curenta
             let startDate = new Date(MENU_START_DATE);
-            let today = new Date(); // Data de azi
-            // Resetam ora pentru comparatie corecta
-            today.setHours(0,0,0,0);
+            let today = new Date();
+            today.setHours(0,0,0,0); // Resetam ora pt comparatie
             
             let activeIndex = 0; // Default Week 1
 
             for(let i=0; i<4; i++) {
                 let s = new Date(startDate); 
-                s.setDate(startDate.getDate() + (i * 7)); // Start saptamana
+                s.setDate(startDate.getDate() + (i * 7)); // Start Luni
                 
                 let e = new Date(s); 
-                e.setDate(s.getDate() + 4); // Vineri
+                e.setDate(s.getDate() + 4); // End Vineri
 
                 let weekEndSunday = new Date(s);
-                weekEndSunday.setDate(s.getDate() + 6); // Duminica
+                weekEndSunday.setDate(s.getDate() + 6); // Duminica (pt detectie)
 
-                // Verificam daca AZI este in aceasta saptamana (pt Current Week label)
+                // Verificam daca AZI este in aceasta saptamana
                 let isCurrent = (today >= s && today <= weekEndSunday);
-                if(isCurrent) activeIndex = i;
+                if(isCurrent) {
+                    activeIndex = i;
+                }
 
                 // Configuram butonul
                 let btn = document.getElementById(`btnW${i}`);
                 if(btn) {
                     btn.dataset.dateText = `${formatDate(s)} - ${formatDate(e)}`;
                     btn.dataset.weekNum = i + 1;
-                    btn.dataset.isCurrent = isCurrent; // Marcam butonul ca fiind curent
-                    updateButtonText(btn);
+                    btn.dataset.isCurrent = isCurrent; 
                 }
             }
-            
-            // Setam saptamana activa initial
+
+            // 2. Setam textele si deschidem saptamana curenta
+            updateStaticTexts();
             changeWeek(activeIndex);
         }
 
@@ -305,15 +297,13 @@
 
         function updateButtonText(btn) {
             const t = TEXTS[currentLang];
-            // Construim HTML-ul butonului
             let html = `<div style="font-weight:700; font-size:1.1em; color:var(--q-gold)">${t.week} ${btn.dataset.weekNum}</div>`;
             html += `<div style="font-size:0.8em; opacity:0.9; color:white; font-weight:400; margin-top:2px">${btn.dataset.dateText}</div>`;
             
-            // Daca este saptamana curenta, adaugam badge-ul
+            // Daca este saptamana curenta, punem badge-ul
             if(btn.dataset.isCurrent === "true") {
                 html += `<div class="current-badge">${t.currWeek}</div>`;
             }
-
             btn.innerHTML = html;
         }
 
@@ -339,7 +329,6 @@
             if(url.includes("ID-UL-TĂU")) return;
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
-
             const bust = url + "&t=" + new Date().getTime();
 
             Papa.parse(bust, {
@@ -360,9 +349,7 @@
         function processExcelData(rows) {
             let roCoords = findBlockCoordinates(rows, "luni");
             let enCoords = findBlockCoordinates(rows, "monday");
-
             if(!roCoords && !enCoords) return null;
-
             return {
                 ro: extractDataFromCoords(rows, roCoords, roCoords), 
                 en: extractDataFromCoords(rows, enCoords, roCoords)  
@@ -374,9 +361,7 @@
                 let rowStr = JSON.stringify(rows[i]).toLowerCase();
                 if(rowStr.includes(keyword)) {
                     for(let k=0; k<rows[i].length; k++) {
-                        if(rows[i][k] && rows[i][k].toLowerCase().includes(keyword)) {
-                            return { row: i, col: k };
-                        }
+                        if(rows[i][k] && rows[i][k].toLowerCase().includes(keyword)) return { row: i, col: k };
                     }
                 }
             }
@@ -385,10 +370,8 @@
 
         function extractDataFromCoords(rows, dataCoords, categoryCoords) {
             if(!dataCoords) return null;
-            
             let headerRow = rows[dataCoords.row];
             let days = headerRow.slice(dataCoords.col, dataCoords.col + 5);
-
             let items = [];
             let r = dataCoords.row + 1;
             let safety = 0;
@@ -399,22 +382,15 @@
                 for(let c=0; c<5; c++) {
                     if(rowData[dataCoords.col + c] && rowData[dataCoords.col + c].trim().length > 1) hasFood = true;
                 }
-
                 if(hasFood) {
                     let catName = "";
                     if(categoryCoords) {
                         let catCol = categoryCoords.col - 1;
-                        if(catCol >= 0 && rows[r][catCol]) {
-                            catName = rows[r][catCol];
-                        }
+                        if(catCol >= 0 && rows[r][catCol]) catName = rows[r][catCol];
                     }
-                    items.push({
-                        category: catName,
-                        food: rowData.slice(dataCoords.col, dataCoords.col + 5)
-                    });
+                    items.push({ category: catName, food: rowData.slice(dataCoords.col, dataCoords.col + 5) });
                 }
-                r++;
-                safety++;
+                r++; safety++;
             }
             return { days: days, items: items };
         }
@@ -423,52 +399,36 @@
             const tbody = document.getElementById('tableBody');
             const thead = document.getElementById('tableHeader');
             tbody.innerHTML = ''; thead.innerHTML = '';
-
             if(!data) return;
             const activeData = currentLang === 'ro' ? (data.ro || data.en) : (data.en || data.ro);
-
             if(!activeData) {
-                tbody.innerHTML = `<tr><td colspan="6">${TEXTS[currentLang].err}</td></tr>`;
-                return;
+                tbody.innerHTML = `<tr><td colspan="6">${TEXTS[currentLang].err}</td></tr>`; return;
             }
 
-            // Calculam indexul zilei curente (0=Luni, 1=Marti... 4=Vineri)
-            // getDay(): 0=Dum, 1=Luni...
+            // Detectie ziua curenta pentru highlight in tabel
             let today = new Date();
-            let dayIndex = today.getDay() - 1; // Ajustam ca Luni sa fie 0
-            
-            // Daca e weekend, nu highlight-uim nimic (setam la -1)
+            let dayIndex = today.getDay() - 1; 
             if(today.getDay() === 0 || today.getDay() === 6) dayIndex = -1;
 
-            // Header
-            let thRow = `<th></th>`; // Spatiu pt categorie
+            let thRow = `<th></th>`;
             activeData.days.forEach((d, idx) => {
-                // Adaugam clasa 'is-today' daca indexul corespunde
                 let cls = (idx === dayIndex) ? 'class="is-today"' : '';
                 thRow += `<th ${cls}>${d}</th>`;
             });
             thead.innerHTML = thRow;
 
-            // Rows
             activeData.items.forEach(row => {
                 let tr = document.createElement('tr');
                 let catLower = row.category.toLowerCase();
                 if(catLower.includes('salad') || catLower.includes('salat') || catLower.includes('snack') || catLower.includes('gustar')) {
                     tr.classList.add('row-salad');
                 }
-
-                let tdCat = document.createElement('td');
-                tdCat.innerHTML = row.category; 
-                tr.appendChild(tdCat);
-
+                let tdCat = document.createElement('td'); tdCat.innerHTML = row.category; tr.appendChild(tdCat);
                 row.food.forEach((f, idx) => {
-                    let td = document.createElement('td');
-                    td.innerText = f || '-';
-                    // Adaugam highlight si pe celula de mancare
+                    let td = document.createElement('td'); td.innerText = f || '-';
                     if(idx === dayIndex) td.classList.add('is-today');
                     tr.appendChild(td);
                 });
-
                 tbody.appendChild(tr);
             });
         }
