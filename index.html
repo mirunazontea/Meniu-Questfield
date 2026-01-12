@@ -35,7 +35,7 @@
             background: var(--q-cream-bg); 
             margin: 0 auto; 
             position: relative; 
-            min-height: 50vh; /* Asigură înălțime pentru loader */
+            min-height: 50vh; 
             display: flex; flex-direction: column;
         }
 
@@ -53,7 +53,6 @@
             font-size: 1.1rem;
         }
         
-        /* Stil Buton Limba Mare */
         .lang-switcher-container {
             display: flex; background: white;
             border: 2px solid var(--q-blue); border-radius: 30px;
@@ -80,7 +79,7 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        /* --- 4. NAVIGATIE BUTOANE (FIX OPTIMIZAT) --- */
+        /* --- 4. NAVIGATIE BUTOANE --- */
         .week-nav {
             display: flex; justify-content: center; gap: 15px;
             margin-bottom: 30px; flex-wrap: wrap;
@@ -117,9 +116,8 @@
         }
 
         /* --- 5. LOADER (Omida) --- */
-        /* Loader-ul apare SINGUR, centrat in container */
         .loader-wrapper {
-            display: none; /* Ascuns initial */
+            display: flex; /* Porneste vizibil */
             flex-direction: column; align-items: center; justify-content: center;
             width: 100%; height: 100%; min-height: 300px;
             flex: 1;
@@ -130,12 +128,17 @@
         }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
-        /* --- 6. CONTINUT (Tabel/Carduri) --- */
-        /* Cand incarcam, aceste clase primesc display:none din JS */
+        /* --- 6. CONTINUT --- */
         .content-wrapper {
-            display: block; width: 100%; animation: fadeIn 0.5s ease;
+            display: none; /* Porneste ascuns */
+            width: 100%; 
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Animatie simpla cand apare continutul */
+        .fade-in-content {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Desktop Table */
         .desktop-view { display: block; overflow-x: auto; padding-bottom: 20px; }
@@ -168,13 +171,11 @@
             .site-header { flex-direction: column; gap: 15px; margin-bottom: 15px; }
             h1.page-title { font-size: 1.6rem; margin-bottom: 20px; }
 
-            /* AICI ESTE FIX-UL PENTRU BUTOANE SUPRAPUSE */
             .week-nav { 
                 gap: 15px; margin-bottom: 40px;
-                /* Spatiu mare intre randuri pentru a acomoda eticheta */
                 row-gap: 50px; 
             }
-            .week-btn { min-width: 40%; flex: 1 1 40%; padding: 10px; min-height: 60px; }
+            .week-btn { min-width: 40%; flex: 1 1 40%; padding: 10px; min-height: 60px; margin-bottom: 5px; }
             .current-badge { bottom: -28px; font-size: 0.65rem; }
 
             .desktop-view { display: none; } 
@@ -209,7 +210,6 @@
     </div>
 
     <div class="container">
-        
         <div id="loaderArea" class="loader-wrapper">
             <lottie-player src="https://api.npoint.io/eaa00a811379b6194348" background="transparent" speed="1" style="width: 250px; height: 250px;" loop autoplay></lottie-player>
             <span id="loaderText">Pregătim meniul...</span>
@@ -224,17 +224,13 @@
             </div>
 
             <div class="mobile-view" id="mobileContainer">
-                </div>
+            </div>
         </div>
-
     </div>
 
     <footer><div>&copy; 2026 Questfield International College</div></footer>
 
     <script>
-        // ==========================================
-        // CONFIGURARE
-        // ==========================================
         const MENU_START_DATE = "2026-01-12"; 
         const LINKS = [
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwcBswQbv2-pcOeX_i_kAu4UubV0UNx0oGofMVLFF-RUr4iiQxg-Mx0JrDkp4fal7uNxraceHSGbnM/pub?gid=0&single=true&output=csv",
@@ -249,7 +245,7 @@
 
         let currentLang = 'ro'; 
         let currentWeekIndex = 0;
-        let cachedData = {};
+        let cachedData = {}; // Aici vom stoca TOATE datele la inceput
 
         // --- UTILS ---
         function formatDate(d) {
@@ -267,6 +263,7 @@
             let today = new Date();
             let activeIndex = 0; 
 
+            // Setup butoane
             for(let i=0; i<4; i++) {
                 let weekStart = new Date(startDate); weekStart.setDate(startDate.getDate() + (i * 7)); 
                 let weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 4); 
@@ -282,8 +279,49 @@
                     btn.dataset.isCurrent = isCurrent ? "true" : "false"; 
                 }
             }
+            currentWeekIndex = activeIndex;
             updateStaticTexts();
-            changeWeek(activeIndex);
+            
+            // INCARCAM TOT ODATA (PREFETCH)
+            fetchAllWeeks();
+        }
+
+        // --- NEW: FETCH ALL AT START ---
+        function fetchAllWeeks() {
+            // Ascundem continut, aratam loader
+            document.getElementById('contentArea').style.display = 'none';
+            document.getElementById('loaderArea').style.display = 'flex';
+
+            // Cream o lista de Promisiuni pentru toate linkurile
+            const promises = LINKS.map(url => {
+                return new Promise((resolve) => {
+                    const bust = url + "&t=" + new Date().getTime();
+                    Papa.parse(bust, {
+                        download: true,
+                        complete: (results) => resolve(results.data),
+                        error: () => resolve(null) // Daca esueaza, returnam null sa nu crape tot
+                    });
+                });
+            });
+
+            // Asteptam sa se termine TOATE
+            Promise.all(promises).then(results => {
+                // Procesam si salvam in cache
+                results.forEach((rows, index) => {
+                    if(rows) {
+                        cachedData[index] = processExcelData(rows);
+                    }
+                });
+
+                // GATA! Ascundem loader, afisam meniul curent INSTANT
+                document.getElementById('loaderArea').style.display = 'none';
+                document.getElementById('contentArea').style.display = 'block';
+                
+                // Randare initiala
+                renderData(cachedData[currentWeekIndex]);
+                // Marcam butonul activ
+                updateNavButtons();
+            });
         }
 
         function updateStaticTexts() {
@@ -304,12 +342,27 @@
             btn.innerHTML = html;
         }
 
+        // --- CHANGE WEEK IS NOW INSTANT ---
         function changeWeek(index) {
             currentWeekIndex = index;
+            updateNavButtons();
+            
+            // Daca avem datele (si ar trebui sa le avem dupa load), le afisam instant
+            if(cachedData[index]) {
+                // Mic efect de fade pentru tranzitie lina
+                const content = document.getElementById('contentArea');
+                content.classList.remove('fade-in-content');
+                void content.offsetWidth; // trigger reflow
+                content.classList.add('fade-in-content');
+                
+                renderData(cachedData[index]);
+            }
+        }
+
+        function updateNavButtons() {
             document.querySelectorAll('.week-btn').forEach((b,i) => {
-                if(i === index) b.classList.add('active'); else b.classList.remove('active');
+                if(i === currentWeekIndex) b.classList.add('active'); else b.classList.remove('active');
             });
-            loadData(LINKS[index]);
         }
 
         function toggleLang() {
@@ -320,44 +373,11 @@
             else { enBtn.classList.add('active'); roBtn.classList.remove('active'); }
             
             updateStaticTexts();
+            // Re-randare instantanee
             if(cachedData[currentWeekIndex]) renderData(cachedData[currentWeekIndex]);
-            else changeWeek(currentWeekIndex);
         }
 
-        // --- CORE: INCARCARE DATE ---
-        function loadData(url) {
-            if(url.includes("ID-UL-TĂU")) return;
-            
-            // 1. ASCUNDEM CONTINUTUL VECHI
-            document.getElementById('contentArea').style.display = 'none';
-            // 2. ARATAM LOADER-UL (Singur pe ecran)
-            document.getElementById('loaderArea').style.display = 'flex';
-            
-            const bust = url + "&t=" + new Date().getTime();
-
-            Papa.parse(bust, {
-                download: true,
-                complete: function(results) {
-                    const parsed = processExcelData(results.data);
-                    cachedData[currentWeekIndex] = parsed;
-                    
-                    // Renderizam in background
-                    renderData(parsed);
-                    
-                    // 3. SWITCH: Ascundem loader, aratam continut nou
-                    setTimeout(() => { 
-                        document.getElementById('loaderArea').style.display = 'none';
-                        document.getElementById('contentArea').style.display = 'block';
-                    }, 600); 
-                },
-                error: function() {
-                    document.getElementById('loaderArea').style.display = 'none';
-                    document.getElementById('contentArea').style.display = 'block';
-                    document.getElementById('mobileContainer').innerHTML = 'Eroare date.';
-                }
-            });
-        }
-
+        // --- PARSING ---
         function processExcelData(rows) {
             let roCoords = findBlockCoordinates(rows, "luni");
             let enCoords = findBlockCoordinates(rows, "monday");
