@@ -147,37 +147,36 @@
             border-color: transparent transparent #E53E3E transparent;
         }
 
-        /* --- CONTAINER GENERAL - FIXUL PENTRU POZITIONARE --- */
+        /* --- CONTAINER GENERAL --- */
         .container {
             width: 100%; max-width: 1100px;
             background: var(--q-cream-bg); 
             margin: 0 auto; 
             
-            /* ACEASTA ESTE CHEIA PENTRU LOADER: */
-            min-height: 50vh;  /* Ocupa macar jumatate de ecran */
-            display: flex;     /* Folosim Flexbox */
+            /* Inaltime minima generoasa pentru a mentine layout-ul stabil */
+            min-height: 60vh;  
+            display: flex;     
             flex-direction: column;
-            justify-content: flex-start; /* Continutul incepe de sus */
-            align-items: stretch; /* Se intinde pe toata latimea */
+            justify-content: flex-start; 
+            align-items: stretch; 
             position: relative;
         }
         
-        /* Cand se incarca (loaderul e vizibil), centram totul */
+        /* Cand se incarca (loaderul e vizibil), centram totul (adica omida) */
         .container.is-loading {
-            justify-content: center; /* Centram vertical */
-            align-items: center;     /* Centram orizontal */
+            justify-content: center; 
+            align-items: center;     
         }
 
         /* --- LOADER (OMIDA) --- */
-        /* ACUM E SIMPLU, FARA ABSOLUTE/FIXED */
+        /* Omida este ascunsa by default si apare doar cand avem nevoie */
         .loader {
-            display: flex; 
+            display: none; /* Ascuns initial */
             flex-direction: column; 
             align-items: center;
             justify-content: center;
             color: var(--q-blue);
             border-radius: 12px;
-            /* Nu mai avem top, left, position aici. E un element normal. */
         }
         
         #loaderText {
@@ -310,7 +309,7 @@
                 gap: 15px; 
                 margin-bottom: 40px;
                 /* FIX OVERLAP: Spatiu mare intre randuri */
-                row-gap: 45px; 
+                row-gap: 50px; 
             }
             .week-btn { 
                 min-width: 40%; flex: 1 1 40%; 
@@ -515,6 +514,10 @@
             
             const loader = document.getElementById('loader');
             const container = document.getElementById('mainContainer');
+            
+            // --- CURATARE INSTANTANEE (Stergem meniul vechi) ---
+            document.getElementById('mobileContainer').innerHTML = '';
+            document.getElementById('tableBody').innerHTML = '';
             
             // Aratam loaderul, centram containerul
             loader.style.display = 'flex';
