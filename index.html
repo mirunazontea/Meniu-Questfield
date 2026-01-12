@@ -21,7 +21,6 @@
             
             --q-white: #FFFFFF;
             --q-text-dark: #111111;  
-            --q-text-gray: #333333;  
         }
 
         body {
@@ -119,26 +118,25 @@
         }
         .lang-btn:hover { background: var(--q-blue); color: var(--q-white); }
 
-        /* TABEL MENIU */
+        /* --- CONTAINER GENERAL --- */
         .container {
             width: 100%; max-width: 1100px;
             background: var(--q-cream-bg); 
             margin: 0 auto; position: relative;
         }
 
-        .table-wrap { 
+        /* --- STILURI PENTRU DESKTOP (TABEL) --- */
+        .desktop-view {
+            display: block;
             overflow-x: auto; 
             min-height: 300px; 
             padding-bottom: 20px; 
-            /* Smooth scrolling pe mobile */
-            -webkit-overflow-scrolling: touch; 
-            padding-left: 1px; /* Fix pentru border */
         }
         
         table { 
             width: 100%; 
             border-collapse: separate; 
-            border-spacing: 8px; /* Spatiere mai mica */
+            border-spacing: 8px; 
             min-width: 800px; 
         }
 
@@ -165,95 +163,107 @@
             font-size: 1rem; padding-right: 15px;
         }
 
-        th.is-today {
-            color: #E53E3E; border-bottom: 3px solid #E53E3E;
-        }
-        th.is-today::after {
-            content: ' (AZI)'; font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800;
-        }
+        th.is-today { color: #E53E3E; border-bottom: 3px solid #E53E3E; }
+        th.is-today::after { content: ' (AZI)'; font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800; }
 
         td.is-today {
             background-color: var(--q-highlight-bg) !important; 
             border: 2px solid var(--q-highlight-border) !important;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
-            position: relative;
         }
 
         tr.row-salad td:not(:first-child) { border-bottom: 3px solid #E2EFDA; }
         
+        /* --- STILURI PENTRU MOBILE (CARDURI) --- */
+        .mobile-view { display: none; width: 100%; }
+
+        .mobile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #EEE;
+        }
+
+        .mobile-card.is-today-card {
+            border: 2px solid var(--q-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            background-color: var(--q-highlight-bg);
+        }
+
+        .mobile-card-header {
+            background-color: var(--q-blue);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .mobile-card.is-today-card .mobile-card-header {
+            background-color: #E53E3E; /* Header rosu pentru AZI */
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+
+        .mobile-card-content { padding: 15px; }
+
+        .mobile-menu-row {
+            display: flex;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #EEE;
+            padding-bottom: 12px;
+        }
+        .mobile-menu-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .mobile-category {
+            width: 35%;
+            font-weight: 800;
+            color: var(--q-blue);
+            font-size: 0.9rem;
+            padding-right: 10px;
+            display: flex; align-items: center;
+        }
+        .mobile-food {
+            width: 65%;
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* LOADER */
         .loader {
             display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--q-cream-bg); 
-            z-index: 20;
+            background: var(--q-cream-bg); z-index: 20;
             justify-content: center; align-items: center; flex-direction: column; color: var(--q-blue);
             border-radius: 8px;
         }
-        
         #loaderText {
             margin-top: -20px; font-weight: 700; font-size: 1.2rem;
-            color: var(--q-blue);
-            animation: pulse 1.5s infinite ease-in-out;
+            color: var(--q-blue); animation: pulse 1.5s infinite ease-in-out;
         }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; }
-        }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
         
         footer { margin-top: 40px; text-align: center; font-size: 0.8rem; color: #AAA; }
 
         /* ========================================= */
-        /* === MOBILE OPTIMIZATIONS (RESPONSIVE) === */
+        /* === MOBILE RESPONSIVE LOGIC === */
         /* ========================================= */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            
-            /* Header stivuit */
-            .site-header { 
-                flex-direction: column; gap: 15px; margin-bottom: 15px; 
-            }
+            .site-header { flex-direction: column; gap: 15px; margin-bottom: 15px; }
             h1.page-title { font-size: 1.6rem; margin-bottom: 20px; }
 
-            /* Butoane 2 pe rand */
+            /* Navigatie butoane 2x2 */
             .week-nav { gap: 10px; margin-bottom: 40px; }
-            .week-btn { 
-                min-width: 40%; flex: 1 1 40%; /* Latime flexibila, 2 pe rand */
-                padding: 10px; min-height: 60px;
-            }
-            /* Ajustare badge pentru a nu se suprapune */
+            .week-btn { min-width: 40%; flex: 1 1 40%; padding: 10px; min-height: 60px; }
             .current-badge { bottom: -22px; font-size: 0.65rem; }
 
-            /* TABLE OPTIMIZATION: Sticky First Column */
-            /* Face ca prima coloana (categoria) sa ramana pe loc la scroll */
-            table { 
-                border-spacing: 6px; 
-                margin-left: 0;
-            }
-            
-            /* Fixarea capului de tabel (Prima celula goala) */
-            th:first-child {
-                position: sticky;
-                left: 0;
-                z-index: 10;
-                background-color: var(--q-cream-bg); /* Trebuie sa aiba fundal ca sa acopere */
-            }
-            
-            /* Fixarea coloanei de categorii */
-            td:first-child {
-                position: sticky;
-                left: 0;
-                z-index: 5;
-                background-color: var(--q-cream-bg); /* Fundal opac */
-                border-right: 2px solid rgba(0,0,0,0.1) !important; /* Separator vizual */
-                text-align: center;
-                padding: 10px 5px;
-                font-size: 0.85rem;
-                width: 90px;
-                min-width: 90px;
-            }
-            
-            /* Ajustare celule mancare */
-            td { min-width: 140px; font-size: 0.9rem; padding: 10px; }
-            th { font-size: 1rem; padding: 10px; }
+            /* SCHIMBAREA MODULUI DE VIZUALIZARE */
+            .desktop-view { display: none; } /* Ascunde tabelul */
+            .mobile-view { display: block; } /* Arata cardurile */
         }
     </style>
 </head>
@@ -282,35 +292,31 @@
     <div class="lang-wrapper"><button onclick="toggleLang()" id="btnLang" class="lang-btn">Switch to English</button></div>
 
     <div class="container">
-        <div class="table-wrap">
-            
-            <div id="loader" class="loader">
-                <lottie-player 
-                    src="https://api.npoint.io/eaa00a811379b6194348" 
-                    background="transparent" 
-                    speed="1" 
-                    style="width: 250px; height: 250px;" 
-                    loop 
-                    autoplay>
-                </lottie-player>
-                
-                <span id="loaderText">Pregătim meniul...</span>
-            </div>
+        
+        <div id="loader" class="loader">
+            <lottie-player src="https://api.npoint.io/eaa00a811379b6194348" background="transparent" speed="1" style="width: 250px; height: 250px;" loop autoplay></lottie-player>
+            <span id="loaderText">Pregătim meniul...</span>
+        </div>
 
+        <div class="table-wrap desktop-view">
             <table id="menuTable">
                 <thead id="tableHeader"></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+
+        <div class="mobile-view" id="mobileContainer">
+            </div>
+
     </div>
 
     <footer><div>&copy; 2026 Questfield International College</div></footer>
 
     <script>
         // ===============================================================
-        // DATA DE START A MENIULUI (LUNI) - FORMAT: AAAA-LL-ZZ
+        // DATA DE START A MENIULUI (LUNI) - SETATA LA ZIUA DE AZI (12.01)
         // ===============================================================
-        const MENU_START_DATE = "2026-01-05"; 
+        const MENU_START_DATE = "2026-01-12"; 
         // ===============================================================
 
         const LINKS = [
@@ -327,7 +333,8 @@
                 langBtn: "Switch to English",
                 week: "Săptămâna",
                 currWeek: "SĂPTĂMÂNA CURENTĂ", 
-                err: "Nu s-au găsit datele pentru această săptămână."
+                err: "Nu s-au găsit datele pentru această săptămână.",
+                todayLabel: "AZI"
             },
             en: {
                 title: "Weekly Lunch Menu",
@@ -335,7 +342,8 @@
                 langBtn: "Schimbă în Română",
                 week: "Week",
                 currWeek: "CURRENT WEEK",
-                err: "No data found for this week."
+                err: "No data found for this week.",
+                todayLabel: "TODAY"
             }
         };
 
@@ -422,7 +430,7 @@
             currentLang = currentLang === 'ro' ? 'en' : 'ro';
             updateStaticTexts();
             if(cachedData[currentWeekIndex]) {
-                renderTable(cachedData[currentWeekIndex]);
+                renderData(cachedData[currentWeekIndex]);
             } else {
                 changeWeek(currentWeekIndex);
             }
@@ -439,10 +447,8 @@
                 complete: function(results) {
                     const parsed = processExcelData(results.data);
                     cachedData[currentWeekIndex] = parsed;
-                    renderTable(parsed);
-                    setTimeout(() => {
-                          loader.style.display = 'none';
-                    }, 800); 
+                    renderData(parsed);
+                    setTimeout(() => { loader.style.display = 'none'; }, 600); 
                 },
                 error: function() {
                     document.getElementById('tableBody').innerHTML = `<tr><td colspan="6">Eroare încărcare date.</td></tr>`;
@@ -500,34 +506,32 @@
             return { days: days, items: items };
         }
 
-        function renderTable(data) {
+        function renderData(data) {
+            // Randare pentru Desktop (Tabel)
+            renderDesktopTable(data);
+            // Randare pentru Mobile (Carduri)
+            renderMobileCards(data);
+        }
+
+        function renderDesktopTable(data) {
             const tbody = document.getElementById('tableBody');
             const thead = document.getElementById('tableHeader');
             tbody.innerHTML = ''; thead.innerHTML = '';
             
-            if(!data) {
-                tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">${TEXTS[currentLang].err}</td></tr>`;
-                return;
-            }
-
+            if(!data) return;
             const activeData = currentLang === 'ro' ? (data.ro || data.en) : (data.en || data.ro);
-            if(!activeData) {
-                tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">${TEXTS[currentLang].err}</td></tr>`; return;
-            }
+            if(!activeData) return;
 
             let selectedWeekStart = new Date(MENU_START_DATE);
             selectedWeekStart.setDate(selectedWeekStart.getDate() + (currentWeekIndex * 7));
-
             let today = new Date();
 
             let thRow = `<th></th>`;
             activeData.days.forEach((d, colIndex) => {
                 let columnDate = new Date(selectedWeekStart);
                 columnDate.setDate(selectedWeekStart.getDate() + colIndex);
-
                 let isToday = isSameDay(columnDate, today);
                 let cls = isToday ? 'class="is-today"' : '';
-                
                 thRow += `<th ${cls}>${d}</th>`;
             });
             thead.innerHTML = thRow;
@@ -542,17 +546,67 @@
                 
                 row.food.forEach((f, colIndex) => {
                     let td = document.createElement('td'); td.innerText = f || '-';
-                    
                     let columnDate = new Date(selectedWeekStart);
                     columnDate.setDate(selectedWeekStart.getDate() + colIndex);
-                    
-                    if(isSameDay(columnDate, today)) {
-                        td.classList.add('is-today');
-                    }
+                    if(isSameDay(columnDate, today)) td.classList.add('is-today');
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
             });
+        }
+
+        function renderMobileCards(data) {
+            const container = document.getElementById('mobileContainer');
+            container.innerHTML = '';
+
+            if(!data) {
+                container.innerHTML = `<div style="text-align:center; padding:20px;">${TEXTS[currentLang].err}</div>`;
+                return;
+            }
+
+            const activeData = currentLang === 'ro' ? (data.ro || data.en) : (data.en || data.ro);
+            if(!activeData) return;
+
+            let selectedWeekStart = new Date(MENU_START_DATE);
+            selectedWeekStart.setDate(selectedWeekStart.getDate() + (currentWeekIndex * 7));
+            let today = new Date();
+
+            // Iteram prin zile (coloane)
+            for(let colIndex = 0; colIndex < 5; colIndex++) {
+                let dayName = activeData.days[colIndex]; 
+                let columnDate = new Date(selectedWeekStart);
+                columnDate.setDate(selectedWeekStart.getDate() + colIndex);
+                let isToday = isSameDay(columnDate, today);
+
+                // Construim cardul
+                let card = document.createElement('div');
+                card.className = 'mobile-card' + (isToday ? ' is-today-card' : '');
+
+                let headerHtml = dayName;
+                if(isToday) {
+                    headerHtml += ` <span style="background:white; color:#E53E3E; font-size:0.7em; padding:2px 6px; border-radius:4px; margin-left:8px;">${TEXTS[currentLang].todayLabel}</span>`;
+                }
+
+                let contentHtml = '';
+                // Iteram prin mancaruri pentru aceasta zi
+                activeData.items.forEach(row => {
+                    let foodItem = row.food[colIndex] || '-';
+                    if(foodItem.trim().length > 1 || foodItem !== '-') {
+                        contentHtml += `
+                            <div class="mobile-menu-row">
+                                <div class="mobile-category">${row.category}</div>
+                                <div class="mobile-food">${foodItem}</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                card.innerHTML = `
+                    <div class="mobile-card-header">${headerHtml}</div>
+                    <div class="mobile-card-content">${contentHtml}</div>
+                `;
+                container.appendChild(card);
+            }
         }
 
         window.onload = initPage;
