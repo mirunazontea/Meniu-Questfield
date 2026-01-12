@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meniu Questfield</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
@@ -14,10 +14,12 @@
             --q-blue: #1D4363;       /* Albastru Marin închis */
             --q-gold: #FFD700;       /* Galben intens */
             --q-cream-bg: #FEFCF5;   /* Fundal pagină */
-            --q-highlight: #FFF8E1;  /* Fundal ZIUA CURENTĂ */
-            --q-border-gold: #F0E68C;
+            
+            /* Culoarea de evidentiere pentru AZI */
+            --q-highlight-bg: #fffde7; 
+            --q-highlight-border: #FFD700;
+            
             --q-white: #FFFFFF;
-            /* Culoare text foarte inchisa pentru vizibilitate maxima */
             --q-text-dark: #111111;  
             --q-text-gray: #333333;  
         }
@@ -55,7 +57,8 @@
         /* NAVIGATIE BUTOANE */
         .week-nav {
             display: flex; justify-content: center; gap: 15px;
-            margin-bottom: 40px; flex-wrap: wrap; /* Spatiu mai mare jos pentru etichete */
+            margin-bottom: 50px; /* Spatiu mai mare jos pentru etichete */
+            flex-wrap: wrap;
         }
 
         .week-btn {
@@ -68,8 +71,8 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 70px;
-            position: relative; /* Necesar pentru pozitionarea etichetei */
-            overflow: visible;  /* Lasam eticheta sa iasa din buton daca e nevoie */
+            position: relative; 
+            overflow: visible;
         }
         
         .week-btn:hover { 
@@ -84,32 +87,31 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
         }
 
-        /* ETICHETA "SAPTAMANA CURENTA" - Vizibila sub buton */
+        /* ETICHETA "SAPTAMANA CURENTA" */
         .current-badge {
             position: absolute;
-            bottom: -25px; /* Scoatem eticheta sub buton */
+            bottom: -32px; /* O scoatem complet sub buton */
             left: 50%;
             transform: translateX(-50%);
-            background-color: #E53E3E; /* Rosu pentru vizibilitate sau pastram Gold */
+            background-color: #E53E3E; /* Rosu aprins sa se vada clar */
             color: white; 
-            font-size: 0.7rem; 
+            font-size: 0.75rem; 
             text-transform: uppercase; 
             font-weight: 800; 
             letter-spacing: 0.5px;
-            padding: 3px 8px; 
-            border-radius: 4px;
+            padding: 4px 10px; 
+            border-radius: 20px;
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             z-index: 10;
         }
-        /* Triunghi mic sus la eticheta */
+        /* Sageata mica sus la eticheta */
         .current-badge::before {
-            content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
-            border-width: 0 4px 4px 4px; border-style: solid;
+            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+            border-width: 0 5px 5px 5px; border-style: solid;
             border-color: transparent transparent #E53E3E transparent;
         }
 
-        /* SCHIMBARE LIMBA */
         .lang-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
         .lang-btn {
             background: transparent; border: 1px solid var(--q-blue);
@@ -136,8 +138,9 @@
 
         th {
             padding: 15px; text-align: center; 
-            font-size: 1.1rem; color: #111; font-weight: 800; /* Bold si Negru */
+            font-size: 1.1rem; color: #111; font-weight: 800; 
             text-transform: capitalize;
+            border-bottom: 2px solid transparent;
         }
 
         td {
@@ -145,7 +148,6 @@
             border-radius: 8px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             vertical-align: top; font-size: 0.95rem; line-height: 1.5;
-            /* CULOARE TEXT FOARTE VIZIBILA */
             color: #222222; border: 1px solid #DDD; text-align: center;
             font-weight: 500;
         }
@@ -157,15 +159,22 @@
             font-size: 1rem; padding-right: 20px;
         }
 
-        /* --- HIGHLIGHT PENTRU ZIUA CURENTA (LUNI, MARTI...) --- */
-        .is-today {
-            background-color: var(--q-highlight) !important; 
-            border: 2px solid var(--q-gold) !important;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+        /* --- STILURI PENTRU ZIUA DE AZI (HIGHLIGHT) --- */
+        /* Aplicam highlight pe header (TH) */
+        th.is-today {
+            color: #E53E3E; /* Text rosu pentru ziua curenta */
+            border-bottom: 3px solid #E53E3E;
         }
         th.is-today::after {
-            content: ' (AZI)'; color: #E53E3E; 
-            font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800;
+            content: ' (AZI)'; font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800;
+        }
+
+        /* Aplicam highlight pe celule (TD) */
+        td.is-today {
+            background-color: var(--q-highlight-bg) !important; 
+            border: 2px solid var(--q-highlight-border) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4) !important;
+            position: relative;
         }
 
         tr.row-salad td:not(:first-child) { border-bottom: 3px solid #E2EFDA; }
@@ -258,7 +267,6 @@
 
         let currentLang = 'ro'; 
         let currentWeekIndex = 0;
-        let realCurrentWeekIndex = -1; // Indexul real al saptamanii curente
         let cachedData = {};
 
         function formatDate(d) {
@@ -267,42 +275,45 @@
             return `${dd}.${mm}`;
         }
 
+        // Functie helper pentru a compara daca doua date sunt in aceeasi zi
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
         function initPage() {
-            // 1. Calculam ce saptamana este curenta
             let startDate = new Date(MENU_START_DATE);
             let today = new Date();
-            today.setHours(0,0,0,0); // Ignoram ora exacta
-
-            let activeIndex = 0; // Default Week 1
+            let activeIndex = 0; 
 
             for(let i=0; i<4; i++) {
-                let s = new Date(startDate); 
-                s.setDate(startDate.getDate() + (i * 7)); // Start Luni
+                // Calculam startul si sfarsitul saptamanii curente din bucla
+                let weekStart = new Date(startDate); 
+                weekStart.setDate(startDate.getDate() + (i * 7)); 
                 
-                let e = new Date(s); 
-                e.setDate(s.getDate() + 4); // End Vineri
+                let weekEnd = new Date(weekStart); 
+                weekEnd.setDate(weekStart.getDate() + 4); 
 
-                // Consideram saptamana curenta pana duminica
-                let weekEndSunday = new Date(s);
-                weekEndSunday.setDate(s.getDate() + 6); 
+                // Calculam Duminica saptamanii pentru a vedea daca "azi" se incadreaza in ea
+                let sundayLimit = new Date(weekStart);
+                sundayLimit.setDate(weekStart.getDate() + 6);
 
-                // Verificam daca AZI este in intervalul Luni - Duminica
-                let isCurrent = (today >= s && today <= weekEndSunday);
+                // Verificam daca AZI este in aceasta saptamana
+                let isCurrent = (today >= weekStart && today <= sundayLimit);
                 if(isCurrent) {
                     activeIndex = i;
-                    realCurrentWeekIndex = i; // Salvam indexul saptamanii reale
                 }
 
                 // Configuram butonul
                 let btn = document.getElementById(`btnW${i}`);
                 if(btn) {
-                    btn.dataset.dateText = `${formatDate(s)} - ${formatDate(e)}`;
+                    btn.dataset.dateText = `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
                     btn.dataset.weekNum = i + 1;
                     btn.dataset.isCurrent = isCurrent ? "true" : "false"; 
                 }
             }
 
-            // 2. Setam textele si deschidem automat saptamana curenta
             updateStaticTexts();
             changeWeek(activeIndex);
         }
@@ -324,7 +335,6 @@
             let html = `<div style="font-weight:700; font-size:1.1rem; color:var(--q-gold)">${t.week} ${btn.dataset.weekNum}</div>`;
             html += `<div style="font-size:0.85rem; opacity:0.9; color:white; font-weight:400; margin-top:2px">${btn.dataset.dateText}</div>`;
             
-            // Daca este saptamana curenta, adaugam badge-ul vizibil
             if(btn.dataset.isCurrent === "true") {
                 html += `<div class="current-badge">${t.currWeek}</div>`;
             }
@@ -351,7 +361,6 @@
 
         function loadData(url) {
             if(url.includes("ID-UL-TĂU") || url.length < 10) return;
-
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
             const bust = url + "&t=" + new Date().getTime();
@@ -435,18 +444,23 @@
                 tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;">${TEXTS[currentLang].err}</td></tr>`; return;
             }
 
-            // --- DETECTIE ZIUA CURENTA PENTRU HIGHLIGHT ---
-            let today = new Date();
-            let dayIndex = today.getDay() - 1; // 0=Luni...
-            if(today.getDay() === 0 || today.getDay() === 6) dayIndex = -1;
+            // --- LOGICA NOUĂ DE DATĂ (METODA CALENDAR) ---
+            // 1. Calculam data de start a saptamanii SELECTATE (nu a celei curente)
+            let selectedWeekStart = new Date(MENU_START_DATE);
+            selectedWeekStart.setDate(selectedWeekStart.getDate() + (currentWeekIndex * 7));
 
-            // !! FIX: Aplicam highlight doar daca suntem pe saptamana curenta !!
-            let shouldHighlight = (currentWeekIndex === realCurrentWeekIndex);
+            let today = new Date(); // Data de azi
 
             let thRow = `<th></th>`;
-            activeData.days.forEach((d, idx) => {
-                // Doar daca e saptamana corecta SI indexul zilei corect
-                let cls = (shouldHighlight && idx === dayIndex) ? 'class="is-today"' : '';
+            activeData.days.forEach((d, colIndex) => {
+                // 2. Calculam data specifica pentru acea coloana (Luni, Marti...)
+                let columnDate = new Date(selectedWeekStart);
+                columnDate.setDate(selectedWeekStart.getDate() + colIndex);
+
+                // 3. Verificam daca data coloanei este egala cu data de azi
+                let isToday = isSameDay(columnDate, today);
+                let cls = isToday ? 'class="is-today"' : '';
+                
                 thRow += `<th ${cls}>${d}</th>`;
             });
             thead.innerHTML = thRow;
@@ -458,10 +472,17 @@
                     tr.classList.add('row-salad');
                 }
                 let tdCat = document.createElement('td'); tdCat.innerHTML = row.category; tr.appendChild(tdCat);
-                row.food.forEach((f, idx) => {
+                
+                row.food.forEach((f, colIndex) => {
                     let td = document.createElement('td'); td.innerText = f || '-';
-                    // Doar daca e saptamana corecta SI indexul zilei corect
-                    if(shouldHighlight && idx === dayIndex) td.classList.add('is-today');
+                    
+                    // Recalculam aceeasi logica pentru celulele de mancare
+                    let columnDate = new Date(selectedWeekStart);
+                    columnDate.setDate(selectedWeekStart.getDate() + colIndex);
+                    
+                    if(isSameDay(columnDate, today)) {
+                        td.classList.add('is-today');
+                    }
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
