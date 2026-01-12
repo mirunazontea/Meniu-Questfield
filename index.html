@@ -2,12 +2,11 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Meniu Questfield</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
@@ -17,7 +16,6 @@
             --q-gold: #FFD700;       /* Galben intens */
             --q-cream-bg: #FEFCF5;   /* Fundal pagină */
             
-            /* Culoarea de evidentiere pentru AZI */
             --q-highlight-bg: #fffde7; 
             --q-highlight-border: #FFD700;
             
@@ -59,17 +57,18 @@
         /* NAVIGATIE BUTOANE */
         .week-nav {
             display: flex; justify-content: center; gap: 15px;
-            margin-bottom: 50px; /* Spatiu mai mare jos pentru etichete */
+            margin-bottom: 50px; 
             flex-wrap: wrap;
+            width: 100%; max-width: 900px;
         }
 
         .week-btn {
             background-color: var(--q-blue); 
             color: var(--q-gold);            
-            border: none; padding: 12px 15px;
+            border: none; padding: 12px 10px;
             font-family: 'Montserrat', sans-serif; 
             font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease;
-            min-width: 180px; text-align: center; border-radius: 8px;
+            min-width: 160px; text-align: center; border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 70px;
@@ -82,7 +81,6 @@
             filter: brightness(1.1);
         }
 
-        /* STIL BUTON ACTIV (Selectat) */
         .week-btn.active {
             border: 3px solid var(--q-gold); 
             background-color: #163a57; 
@@ -92,33 +90,32 @@
         /* ETICHETA "SAPTAMANA CURENTA" */
         .current-badge {
             position: absolute;
-            bottom: -32px; /* O scoatem complet sub buton */
+            bottom: -28px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #E53E3E; /* Rosu aprins sa se vada clar */
+            background-color: #E53E3E; 
             color: white; 
-            font-size: 0.75rem; 
+            font-size: 0.70rem; 
             text-transform: uppercase; 
             font-weight: 800; 
             letter-spacing: 0.5px;
-            padding: 4px 10px; 
+            padding: 3px 8px; 
             border-radius: 20px;
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             z-index: 10;
         }
-        /* Sageata mica sus la eticheta */
         .current-badge::before {
-            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
-            border-width: 0 5px 5px 5px; border-style: solid;
+            content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+            border-width: 0 4px 4px 4px; border-style: solid;
             border-color: transparent transparent #E53E3E transparent;
         }
 
         .lang-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
         .lang-btn {
             background: transparent; border: 1px solid var(--q-blue);
-            color: var(--q-blue); padding: 6px 18px; 
-            font-size: 0.8rem; font-weight: 700; cursor: pointer; border-radius: 4px;
+            color: var(--q-blue); padding: 8px 20px; 
+            font-size: 0.9rem; font-weight: 700; cursor: pointer; border-radius: 4px;
         }
         .lang-btn:hover { background: var(--q-blue); color: var(--q-white); }
 
@@ -129,12 +126,19 @@
             margin: 0 auto; position: relative;
         }
 
-        .table-wrap { overflow-x: auto; min-height: 300px; padding-bottom: 20px; }
+        .table-wrap { 
+            overflow-x: auto; 
+            min-height: 300px; 
+            padding-bottom: 20px; 
+            /* Smooth scrolling pe mobile */
+            -webkit-overflow-scrolling: touch; 
+            padding-left: 1px; /* Fix pentru border */
+        }
         
         table { 
             width: 100%; 
             border-collapse: separate; 
-            border-spacing: 12px; 
+            border-spacing: 8px; /* Spatiere mai mica */
             min-width: 800px; 
         }
 
@@ -146,10 +150,10 @@
         }
 
         td {
-            background-color: var(--q-white); padding: 20px;
+            background-color: var(--q-white); padding: 15px;
             border-radius: 8px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            vertical-align: top; font-size: 0.95rem; line-height: 1.5;
+            vertical-align: top; font-size: 0.95rem; line-height: 1.4;
             color: #222222; border: 1px solid #DDD; text-align: center;
             font-weight: 500;
         }
@@ -157,14 +161,12 @@
         td:first-child {
             background-color: transparent; box-shadow: none; border: none;
             text-align: right; font-weight: 800; color: var(--q-blue);
-            width: 120px; vertical-align: middle; 
-            font-size: 1rem; padding-right: 20px;
+            width: 110px; vertical-align: middle; 
+            font-size: 1rem; padding-right: 15px;
         }
 
-        /* --- STILURI PENTRU ZIUA DE AZI (HIGHLIGHT) --- */
         th.is-today {
-            color: #E53E3E; /* Text rosu pentru ziua curenta */
-            border-bottom: 3px solid #E53E3E;
+            color: #E53E3E; border-bottom: 3px solid #E53E3E;
         }
         th.is-today::after {
             content: ' (AZI)'; font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800;
@@ -173,13 +175,12 @@
         td.is-today {
             background-color: var(--q-highlight-bg) !important; 
             border: 2px solid var(--q-highlight-border) !important;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4) !important;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important;
             position: relative;
         }
 
         tr.row-salad td:not(:first-child) { border-bottom: 3px solid #E2EFDA; }
         
-        /* --- STIL NOU PENTRU LOADER (Lottie) --- */
         .loader {
             display: flex; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--q-cream-bg); 
@@ -188,33 +189,83 @@
             border-radius: 8px;
         }
         
-        /* Textul de sub animatie */
         #loaderText {
-            margin-top: -20px; 
-            font-weight: 700;
-            font-size: 1.2rem;
+            margin-top: -20px; font-weight: 700; font-size: 1.2rem;
             color: var(--q-blue);
             animation: pulse 1.5s infinite ease-in-out;
         }
 
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; }
         }
         
         footer { margin-top: 40px; text-align: center; font-size: 0.8rem; color: #AAA; }
+
+        /* ========================================= */
+        /* === MOBILE OPTIMIZATIONS (RESPONSIVE) === */
+        /* ========================================= */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            /* Header stivuit */
+            .site-header { 
+                flex-direction: column; gap: 15px; margin-bottom: 15px; 
+            }
+            h1.page-title { font-size: 1.6rem; margin-bottom: 20px; }
+
+            /* Butoane 2 pe rand */
+            .week-nav { gap: 10px; margin-bottom: 40px; }
+            .week-btn { 
+                min-width: 40%; flex: 1 1 40%; /* Latime flexibila, 2 pe rand */
+                padding: 10px; min-height: 60px;
+            }
+            /* Ajustare badge pentru a nu se suprapune */
+            .current-badge { bottom: -22px; font-size: 0.65rem; }
+
+            /* TABLE OPTIMIZATION: Sticky First Column */
+            /* Face ca prima coloana (categoria) sa ramana pe loc la scroll */
+            table { 
+                border-spacing: 6px; 
+                margin-left: 0;
+            }
+            
+            /* Fixarea capului de tabel (Prima celula goala) */
+            th:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 10;
+                background-color: var(--q-cream-bg); /* Trebuie sa aiba fundal ca sa acopere */
+            }
+            
+            /* Fixarea coloanei de categorii */
+            td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 5;
+                background-color: var(--q-cream-bg); /* Fundal opac */
+                border-right: 2px solid rgba(0,0,0,0.1) !important; /* Separator vizual */
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.85rem;
+                width: 90px;
+                min-width: 90px;
+            }
+            
+            /* Ajustare celule mancare */
+            td { min-width: 140px; font-size: 0.9rem; padding: 10px; }
+            th { font-size: 1rem; padding: 10px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="site-header">
         <div class="logo-placeholder">
-            <svg width="40" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="35" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" fill="#b8860b"/>
                 <path d="M12 4L18 6.5V11C18 15.5 15.5 19.5 12 20.5V4Z" fill="#1D4363"/>
             </svg>
-            <div>QUESTFIELD<br><span style="font-size:0.7em; color:#1D4363">INTERNATIONAL COLLEGE</span></div>
+            <div style="line-height:1.2">QUESTFIELD<br><span style="font-size:0.7em; color:#1D4363">INTERNATIONAL COLLEGE</span></div>
         </div>
         <div class="flags">🇷🇴 🇬🇧</div>
     </div>
@@ -238,7 +289,7 @@
                     src="https://api.npoint.io/eaa00a811379b6194348" 
                     background="transparent" 
                     speed="1" 
-                    style="width: 300px; height: 300px;" 
+                    style="width: 250px; height: 250px;" 
                     loop 
                     autoplay>
                 </lottie-player>
@@ -389,9 +440,8 @@
                     const parsed = processExcelData(results.data);
                     cachedData[currentWeekIndex] = parsed;
                     renderTable(parsed);
-                    // Adaugăm un mic delay ca să se vadă animația puțin, chiar dacă se încarcă rapid
                     setTimeout(() => {
-                         loader.style.display = 'none';
+                          loader.style.display = 'none';
                     }, 800); 
                 },
                 error: function() {
