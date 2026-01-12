@@ -45,12 +45,17 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 25px;
         }
+        
+        /* Updated Logo Style */
         .logo-placeholder {
-            display: flex; align-items: center; gap: 12px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700; color: #b8860b;
-            text-transform: uppercase; letter-spacing: 1px;
-            font-size: 1.1rem;
+            display: flex; align-items: center;
+        }
+        .logo-placeholder img {
+            height: auto;
+            width: auto;
+            max-width: 280px; /* Ensures it doesn't get too huge on desktop */
+            max-height: 70px; /* Ensures it fits the header height */
+            object-fit: contain;
         }
         
         .lang-switcher-container {
@@ -168,7 +173,8 @@
         /* --- 7. RESPONSIVE MOBILE FIXES --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .site-header { flex-direction: column; gap: 15px; margin-bottom: 15px; }
+            .site-header { flex-direction: row; gap: 15px; margin-bottom: 15px; } /* Kept row for mobile so logo and lang are side by side */
+            .logo-placeholder img { max-height: 50px; } /* Smaller logo on mobile */
             h1.page-title { font-size: 1.6rem; margin-bottom: 20px; }
 
             .week-nav { 
@@ -187,11 +193,7 @@
 
     <div class="site-header">
         <div class="logo-placeholder">
-            <svg width="35" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" fill="#b8860b"/>
-                <path d="M12 4L18 6.5V11C18 15.5 15.5 19.5 12 20.5V4Z" fill="#1D4363"/>
-            </svg>
-            <div style="line-height:1.2">QUESTFIELD<br><span style="font-size:0.7em; color:#1D4363">INTERNATIONAL COLLEGE</span></div>
+            <img src="logo_wide_nou 2024.png" alt="Questfield International College">
         </div>
 
         <div class="lang-switcher-container" onclick="toggleLang()">
@@ -384,7 +386,8 @@
             if(!roCoords && !enCoords) return null;
             return {
                 ro: extractDataFromCoords(rows, roCoords, roCoords), 
-                en: extractDataFromCoords(rows, enCoords, roCoords)  
+                // BUG FIX: Pass enCoords as the 3rd argument (categoryCoords) so it looks next to English days
+                en: extractDataFromCoords(rows, enCoords, enCoords)  
             };
         }
 
