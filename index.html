@@ -46,15 +46,14 @@
             margin-bottom: 25px;
         }
         
-        /* Updated Logo Style */
         .logo-placeholder {
             display: flex; align-items: center;
         }
         .logo-placeholder img {
             height: auto;
             width: auto;
-            max-width: 280px; /* Ensures it doesn't get too huge on desktop */
-            max-height: 70px; /* Ensures it fits the header height */
+            max-width: 280px; 
+            max-height: 70px; 
             object-fit: contain;
         }
         
@@ -151,8 +150,10 @@
         th { padding: 15px; text-align: center; font-size: 1.1rem; color: #111; font-weight: 800; text-transform: capitalize; }
         td { background-color: var(--q-white); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); vertical-align: top; font-size: 0.95rem; line-height: 1.4; color: #222222; border: 1px solid #DDD; text-align: center; font-weight: 500; }
         td:first-child { background-color: transparent; box-shadow: none; border: none; text-align: right; font-weight: 800; color: var(--q-blue); width: 110px; vertical-align: middle; font-size: 1rem; padding-right: 15px; }
+        
+        /* REPARAT: Am scos regula cu ' (AZI)' hardcodat */
         th.is-today { color: #E53E3E; border-bottom: 3px solid #E53E3E; }
-        th.is-today::after { content: ' (AZI)'; font-size: 0.7em; margin-left: 5px; vertical-align: middle; font-weight: 800; }
+        
         td.is-today { background-color: var(--q-highlight-bg) !important; border: 2px solid var(--q-highlight-border) !important; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4) !important; }
         tr.row-salad td:not(:first-child) { border-bottom: 3px solid #E2EFDA; }
 
@@ -173,8 +174,8 @@
         /* --- 7. RESPONSIVE MOBILE FIXES --- */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .site-header { flex-direction: row; gap: 15px; margin-bottom: 15px; } /* Kept row for mobile so logo and lang are side by side */
-            .logo-placeholder img { max-height: 50px; } /* Smaller logo on mobile */
+            .site-header { flex-direction: row; gap: 15px; margin-bottom: 15px; } 
+            .logo-placeholder img { max-height: 50px; } 
             h1.page-title { font-size: 1.6rem; margin-bottom: 20px; }
 
             .week-nav { 
@@ -247,7 +248,7 @@
 
         let currentLang = 'ro'; 
         let currentWeekIndex = 0;
-        let cachedData = {}; // Aici vom stoca TOATE datele la inceput
+        let cachedData = {}; 
 
         // --- UTILS ---
         function formatDate(d) {
@@ -283,45 +284,34 @@
             }
             currentWeekIndex = activeIndex;
             updateStaticTexts();
-            
-            // INCARCAM TOT ODATA (PREFETCH)
             fetchAllWeeks();
         }
 
-        // --- NEW: FETCH ALL AT START ---
+        // --- FETCH ALL ---
         function fetchAllWeeks() {
-            // Ascundem continut, aratam loader
             document.getElementById('contentArea').style.display = 'none';
             document.getElementById('loaderArea').style.display = 'flex';
 
-            // Cream o lista de Promisiuni pentru toate linkurile
             const promises = LINKS.map(url => {
                 return new Promise((resolve) => {
                     const bust = url + "&t=" + new Date().getTime();
                     Papa.parse(bust, {
                         download: true,
                         complete: (results) => resolve(results.data),
-                        error: () => resolve(null) // Daca esueaza, returnam null sa nu crape tot
+                        error: () => resolve(null) 
                     });
                 });
             });
 
-            // Asteptam sa se termine TOATE
             Promise.all(promises).then(results => {
-                // Procesam si salvam in cache
                 results.forEach((rows, index) => {
                     if(rows) {
                         cachedData[index] = processExcelData(rows);
                     }
                 });
-
-                // GATA! Ascundem loader, afisam meniul curent INSTANT
                 document.getElementById('loaderArea').style.display = 'none';
                 document.getElementById('contentArea').style.display = 'block';
-                
-                // Randare initiala
                 renderData(cachedData[currentWeekIndex]);
-                // Marcam butonul activ
                 updateNavButtons();
             });
         }
@@ -344,19 +334,15 @@
             btn.innerHTML = html;
         }
 
-        // --- CHANGE WEEK IS NOW INSTANT ---
         function changeWeek(index) {
             currentWeekIndex = index;
             updateNavButtons();
             
-            // Daca avem datele (si ar trebui sa le avem dupa load), le afisam instant
             if(cachedData[index]) {
-                // Mic efect de fade pentru tranzitie lina
                 const content = document.getElementById('contentArea');
                 content.classList.remove('fade-in-content');
-                void content.offsetWidth; // trigger reflow
+                void content.offsetWidth; 
                 content.classList.add('fade-in-content');
-                
                 renderData(cachedData[index]);
             }
         }
@@ -375,7 +361,6 @@
             else { enBtn.classList.add('active'); roBtn.classList.remove('active'); }
             
             updateStaticTexts();
-            // Re-randare instantanee
             if(cachedData[currentWeekIndex]) renderData(cachedData[currentWeekIndex]);
         }
 
@@ -386,7 +371,6 @@
             if(!roCoords && !enCoords) return null;
             return {
                 ro: extractDataFromCoords(rows, roCoords, roCoords), 
-                // BUG FIX: Pass enCoords as the 3rd argument (categoryCoords) so it looks next to English days
                 en: extractDataFromCoords(rows, enCoords, enCoords)  
             };
         }
@@ -447,7 +431,10 @@
             activeData.days.forEach((d, colIndex) => {
                 let colDate = new Date(selectedWeekStart); colDate.setDate(selectedWeekStart.getDate() + colIndex);
                 let isToday = isSameDay(colDate, today);
-                thRow += `<th ${isToday ? 'class="is-today"' : ''}>${d}</th>`;
+                
+                // REPARAT: Adaugam eticheta AZI/TODAY din JS
+                let todayBadge = isToday ? ` <span style="font-size:0.7em; margin-left:5px; vertical-align:middle; font-weight:800">(${TEXTS[currentLang].todayLabel})</span>` : '';
+                thRow += `<th ${isToday ? 'class="is-today"' : ''}>${d}${todayBadge}</th>`;
             });
             thead.innerHTML = thRow;
 
